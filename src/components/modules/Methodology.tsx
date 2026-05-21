@@ -29,16 +29,17 @@ export function Methodology() {
   const { unlockedItems, unlockItem, spendPoints, points } = useAppStore();
   const filtered = tab === "all" ? ITEMS : ITEMS.filter((i) => i.type === tab);
 
-  const handleUnlock = (it: (typeof ITEMS)[number]) => {
+  const handleUnlock = async (it: (typeof ITEMS)[number]) => {
     if (unlockedItems.includes(it.id) || it.cost === 0) {
       toast.success(`«${it.title}» жүктелуде...`);
       return;
     }
-    if (!spendPoints(it.cost)) {
+    const ok = await spendPoints(it.cost);
+    if (!ok) {
       toast.error("Ұпай жеткіліксіз");
       return;
     }
-    unlockItem(it.id);
+    await unlockItem(it.id);
     toast.success(`Ашылды! −${it.cost} ұпай`);
   };
 
