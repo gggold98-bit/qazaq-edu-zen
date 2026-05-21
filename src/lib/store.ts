@@ -55,7 +55,12 @@ interface AppState {
   // admin mode
   isAdminMode: boolean;
   toggleAdminMode: () => void;
+
+  // language
+  lang: "kk" | "ru" | "en";
+  setLang: (l: "kk" | "ru" | "en") => void;
 }
+
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -128,13 +133,18 @@ export const useAppStore = create<AppState>()(
 
       isAdminMode: false,
       toggleAdminMode: () => set({ isAdminMode: !get().isAdminMode }),
+
+      lang: "kk",
+      setLang: (l) => set({ lang: l }),
     }),
     {
       name: "qazaq-teachers-ai",
       partialize: (s) => ({
         theme: s.theme,
+        lang: s.lang,
       }),
     },
+
   ),
 );
 
