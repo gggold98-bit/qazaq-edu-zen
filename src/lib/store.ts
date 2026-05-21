@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { supabase } from "@/integrations/supabase/client";
 
 export type TabKey =
   | "dashboard"
@@ -12,6 +13,7 @@ export type TabKey =
   | "admin";
 
 export interface UserProfile {
+  id: string;
   email: string;
   fullName: string;
   avatarUrl?: string;
@@ -21,10 +23,10 @@ export interface UserProfile {
 interface AppState {
   // auth
   user: UserProfile | null;
-  login: (email: string, password: string) => { ok: boolean; error?: string };
-  loginWithGoogle: () => void;
-  register: (email: string, password: string, fullName: string) => { ok: boolean; error?: string };
-  logout: () => void;
+  authReady: boolean;
+  setAuthReady: (v: boolean) => void;
+  setUser: (u: UserProfile | null) => void;
+  logout: () => Promise<void>;
 
   // theme
   theme: "light" | "dark";
@@ -34,71 +36,45 @@ interface AppState {
   activeTab: TabKey;
   setActiveTab: (t: TabKey) => void;
 
-  // metrics
+  // metrics (persisted in DB when logged in)
   points: number;
-  addPoints: (n: number) => void;
-  spendPoints: (n: number) => boolean;
+  setPoints: (n: number) => void;
+  addPoints: (n: number) => Promise<void>;
+  spendPoints: (n: number) => Promise<boolean>;
   students: number;
   lessonPlans: number;
   certificates: number;
-  incrementCertificates: () => void;
+  setCertificates: (n: number) => void;
+  incrementCertificates: () => Promise<void>;
 
   // unlocked library/methodology items
   unlockedItems: string[];
-  unlockItem: (id: string) => void;
+  setUnlockedItems: (ids: string[]) => void;
+  unlockItem: (id: string) => Promise<void>;
 
   // admin mode
   isAdminMode: boolean;
   toggleAdminMode: () => void;
 }
 
-const MOCK_EMAIL = "karlygash@gmail.com";
-const MOCK_PASS = "teacher2026";
-
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
-      login: (email, password) => {
-        if (email.trim().toLowerCase() === MOCK_EMAIL && password === MOCK_PASS) {
-          set({
-            user: {
-              email: MOCK_EMAIL,
-              fullName: "Суханберді Қарлығаш",
-              role: "teacher",
-            },
-          });
-          return { ok: true };
-        }
-        // accept any other valid-looking email for demo
-        if (email.includes("@") && password.length >= 6) {
-          set({
-            user: {
-              email,
-              fullName: email.split("@")[0],
-              role: "teacher",
-            },
-          });
-          return { ok: true };
-        }
-        return { ok: false, error: "Қате email немесе құпиясөз" };
-      },
-      loginWithGoogle: () => {
+      authReady: false,
+      setAuthReady: (v) => set({ authReady: v }),
+      setUser: (u) => set({ user: u }),
+      logout: async () => {
+        await supabase.auth.signOut();
         set({
-          user: {
-            email: MOCK_EMAIL,
-            fullName: "Суханберді Қарлығаш",
-            role: "teacher",
-          },
+          user: null,
+          activeTab: "dashboard",
+          isAdminMode: false,
+          points: 450,
+          certificates: 3,
+          unlockedItems: [],
         });
       },
-      register: (email, password, fullName) => {
-        if (!email.includes("@")) return { ok: false, error: "Жарамды email енгізіңіз" };
-        if (password.length < 6) return { ok: false, error: "Құпиясөз кемінде 6 таңба" };
-        set({ user: { email, fullName: fullName || email.split("@")[0], role: "teacher" } });
-        return { ok: true };
-      },
-      logout: () => set({ user: null, activeTab: "dashboard", isAdminMode: false }),
 
       theme: "light",
       toggleTheme: () => {
@@ -113,22 +89,41 @@ export const useAppStore = create<AppState>()(
       setActiveTab: (t) => set({ activeTab: t }),
 
       points: 450,
-      addPoints: (n) => set({ points: get().points + n }),
-      spendPoints: (n) => {
+      setPoints: (n) => set({ points: n }),
+      addPoints: async (n) => {
+        const next = get().points + n;
+        set({ points: next });
+        const uid = get().user?.id;
+        if (uid) await supabase.from("profiles").update({ points: next }).eq("id", uid);
+      },
+      spendPoints: async (n) => {
         if (get().points < n) return false;
-        set({ points: get().points - n });
+        const next = get().points - n;
+        set({ points: next });
+        const uid = get().user?.id;
+        if (uid) await supabase.from("profiles").update({ points: next }).eq("id", uid);
         return true;
       },
       students: 112,
       lessonPlans: 18,
       certificates: 3,
-      incrementCertificates: () => set({ certificates: get().certificates + 1 }),
+      setCertificates: (n) => set({ certificates: n }),
+      incrementCertificates: async () => {
+        const next = get().certificates + 1;
+        set({ certificates: next });
+        const uid = get().user?.id;
+        if (uid) await supabase.from("profiles").update({ certificates: next }).eq("id", uid);
+      },
 
       unlockedItems: [],
-      unlockItem: (id) => {
-        if (!get().unlockedItems.includes(id)) {
-          set({ unlockedItems: [...get().unlockedItems, id] });
-        }
+      setUnlockedItems: (ids) => set({ unlockedItems: ids }),
+      unlockItem: async (id) => {
+        const cur = get().unlockedItems;
+        if (cur.includes(id)) return;
+        const next = [...cur, id];
+        set({ unlockedItems: next });
+        const uid = get().user?.id;
+        if (uid) await supabase.from("profiles").update({ unlocked_items: next }).eq("id", uid);
       },
 
       isAdminMode: false,
@@ -137,11 +132,7 @@ export const useAppStore = create<AppState>()(
     {
       name: "qazaq-teachers-ai",
       partialize: (s) => ({
-        user: s.user,
         theme: s.theme,
-        points: s.points,
-        certificates: s.certificates,
-        unlockedItems: s.unlockedItems,
       }),
     },
   ),
@@ -152,5 +143,72 @@ if (typeof window !== "undefined") {
   queueMicrotask(() => {
     const t = useAppStore.getState().theme;
     document.documentElement.classList.toggle("dark", t === "dark");
+  });
+}
+
+// ---- Auth + profile sync ----
+async function hydrateProfile(userId: string, email: string, fallbackName: string, avatarUrl?: string) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("full_name, avatar_url, points, certificates, unlocked_items")
+    .eq("id", userId)
+    .maybeSingle();
+
+  let profile = data;
+  if (!profile && !error) {
+    // ensure a row exists (in case trigger didn't fire)
+    await supabase.from("profiles").insert({
+      id: userId,
+      email,
+      full_name: fallbackName,
+      avatar_url: avatarUrl ?? null,
+    });
+    const { data: again } = await supabase
+      .from("profiles")
+      .select("full_name, avatar_url, points, certificates, unlocked_items")
+      .eq("id", userId)
+      .maybeSingle();
+    profile = again;
+  }
+
+  const s = useAppStore.getState();
+  s.setUser({
+    id: userId,
+    email,
+    fullName: profile?.full_name || fallbackName,
+    avatarUrl: profile?.avatar_url || avatarUrl,
+    role: "teacher",
+  });
+  if (profile) {
+    s.setPoints(profile.points ?? 450);
+    s.setCertificates(profile.certificates ?? 3);
+    s.setUnlockedItems(profile.unlocked_items ?? []);
+  }
+}
+
+if (typeof window !== "undefined") {
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session?.user) {
+      const u = session.user;
+      const meta = (u.user_metadata ?? {}) as Record<string, unknown>;
+      const name =
+        (meta.full_name as string) ||
+        (meta.name as string) ||
+        (u.email ? u.email.split("@")[0] : "Ұстаз");
+      const avatar = (meta.avatar_url as string) || (meta.picture as string);
+      // defer to avoid auth deadlocks
+      setTimeout(() => {
+        hydrateProfile(u.id, u.email ?? "", name, avatar).finally(() =>
+          useAppStore.getState().setAuthReady(true),
+        );
+      }, 0);
+    } else {
+      useAppStore.getState().setUser(null);
+      useAppStore.getState().setAuthReady(true);
+    }
+  });
+
+  supabase.auth.getSession().then(({ data }) => {
+    if (!data.session) useAppStore.getState().setAuthReady(true);
   });
 }
