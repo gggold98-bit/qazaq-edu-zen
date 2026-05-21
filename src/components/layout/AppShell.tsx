@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { useAppStore, type TabKey } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -35,16 +36,6 @@ import { Academy } from "@/components/modules/Academy";
 import { Subscriptions } from "@/components/modules/Subscriptions";
 import { AdminUploader } from "@/components/modules/AdminUploader";
 
-const NAV: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: "dashboard", label: "Басты бет", icon: LayoutDashboard },
-  { key: "adilet", label: "Adilet AI", icon: Scale },
-  { key: "methodology", label: "Әдістемелік кабинет", icon: BookOpen },
-  { key: "whiteboard", label: "AI Интерактивті тақта", icon: PenTool },
-  { key: "library", label: "AI Кітапхана", icon: Library },
-  { key: "academy", label: "Академия", icon: GraduationCap },
-  { key: "subscriptions", label: "Жазылымдар", icon: CreditCard },
-];
-
 function initials(name: string) {
   return name
     .split(/\s+/)
@@ -57,10 +48,20 @@ function initials(name: string) {
 export function AppShell() {
   const {
     user, logout, activeTab, setActiveTab, points, theme, toggleTheme,
-    isAdminMode, toggleAdminMode,
+    isAdminMode, toggleAdminMode, lang, setLang,
   } = useAppStore();
-  const [lang, setLang] = useState<"kk" | "ru" | "en">("kk");
+  const t = useT();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const NAV: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { key: "dashboard",     label: t("Басты бет",                "Главная",                  "Home"),                 icon: LayoutDashboard },
+    { key: "adilet",        label: t("Adilet AI",                "Adilet AI",                "Adilet AI"),            icon: Scale },
+    { key: "methodology",   label: t("Әдістемелік кабинет",      "Методический кабинет",     "Methodology cabinet"),  icon: BookOpen },
+    { key: "whiteboard",    label: t("AI Интерактивті тақта",    "AI Интерактивная доска",   "AI Interactive board"), icon: PenTool },
+    { key: "library",       label: t("AI Кітапхана",             "AI Библиотека",            "AI Library"),           icon: Library },
+    { key: "academy",       label: t("Академия",                 "Академия",                 "Academy"),              icon: GraduationCap },
+    { key: "subscriptions", label: t("Жазылымдар",               "Подписки",                 "Subscriptions"),        icon: CreditCard },
+  ];
 
   if (!user) return null;
 
@@ -78,7 +79,7 @@ export function AppShell() {
               </div>
               <div>
                 <div className="text-sm font-semibold tracking-tight">Qazaq Teachers</div>
-                <div className="text-[11px] text-muted-foreground">AI экожүйе</div>
+                <div className="text-[11px] text-muted-foreground">{t("AI экожүйе", "AI экосистема", "AI ecosystem")}</div>
               </div>
             </div>
             <button className="lg:hidden" onClick={() => setMobileOpen(false)} aria-label="Close menu">
@@ -123,7 +124,7 @@ export function AppShell() {
               }`}
             >
               <ShieldCheck className="h-4 w-4" />
-              Admin режимі
+              {t("Admin режимі", "Режим Admin", "Admin mode")}
               <span className={`ml-auto h-5 w-9 rounded-full p-0.5 transition-colors ${isAdminMode ? "bg-primary" : "bg-muted"}`}>
                 <span className={`block h-4 w-4 rounded-full bg-white transition-transform ${isAdminMode ? "translate-x-4" : ""}`} />
               </span>
@@ -133,7 +134,7 @@ export function AppShell() {
           <div className="p-3">
             <Button variant="outline" onClick={logout} className="w-full justify-start gap-2 rounded-xl">
               <LogOut className="h-4 w-4" />
-              Шығу
+              {t("Шығу", "Выйти", "Sign out")}
             </Button>
           </div>
         </div>
@@ -150,7 +151,7 @@ export function AppShell() {
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <div className="glass hidden items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold sm:flex">
               <Coins className="h-4 w-4 text-primary" />
-              <span>{points.toLocaleString("kk-KZ")} ұпай</span>
+              <span>{points.toLocaleString("kk-KZ")} {t("ұпай", "баллов", "points")}</span>
             </div>
 
             <Select value={lang} onValueChange={(v) => setLang(v as "kk" | "ru" | "en")}>
