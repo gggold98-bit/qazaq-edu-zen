@@ -14,7 +14,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { useT } from "@/lib/i18n";
+import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
+
 
 
 interface Msg { role: "user" | "ai"; text: string }
@@ -139,7 +141,8 @@ export function AdiletAI() {
 
 function ComplaintConstructor() {
   const t = useT();
-  const { user } = useAppStoreCompat();
+  const user = useAppStore((s) => s.user);
+
   const [school, setSchool] = useState("");
   const [director, setDirector] = useState("");
   const [teacher, setTeacher] = useState(user?.fullName ?? "");
