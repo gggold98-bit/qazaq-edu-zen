@@ -165,10 +165,6 @@ export function AuthGate() {
               Google аккаунтымен кіру
             </Button>
 
-            <div className="mt-6 rounded-xl border border-dashed border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
-              <div className="font-medium text-foreground">Демо тіркелгі</div>
-              karlygash@gmail.com · teacher2026
-            </div>
           </div>
         </motion.div>
       </div>
