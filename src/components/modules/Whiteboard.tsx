@@ -2,15 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { Eraser, Undo2, Redo2, Trash2, Play, Pause, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { useT } from "@/lib/i18n";
 
 const COLORS = ["#16a34a", "#0ea5e9", "#f59e0b", "#ef4444", "#6366f1", "#111827", "#ffffff"];
 
 export function Whiteboard() {
+  const t = useT();
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">AI Интерактивті тақта</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Сабақ беруге арналған құралдар жинағы</p>
+        <h1 className="text-3xl font-semibold tracking-tight">{t("AI Интерактивті тақта", "AI Интерактивная доска", "AI Interactive board")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Сабақ беруге арналған құралдар жинағы", "Набор инструментов для проведения уроков", "Toolkit for teaching lessons")}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -129,6 +131,7 @@ function Canvas() {
 }
 
 function NoiseMonitor() {
+  const t = useT();
   const [level, setLevel] = useState(35);
   const [running, setRunning] = useState(false);
   useEffect(() => {
@@ -137,32 +140,33 @@ function NoiseMonitor() {
     return () => clearInterval(i);
   }, [running]);
   const status =
-    level < 45 ? { txt: "Тыныш", color: "bg-emerald-500", text: "text-emerald-500" } :
-    level < 70 ? { txt: "Жұмыс деңгейі", color: "bg-amber-500", text: "text-amber-500" } :
-    { txt: "Шулы! Назар аударыңыз", color: "bg-red-500", text: "text-red-500" };
+    level < 45 ? { txt: t("Тыныш", "Тихо", "Quiet"), color: "bg-emerald-500", text: "text-emerald-500" } :
+    level < 70 ? { txt: t("Жұмыс деңгейі", "Рабочий уровень", "Working level"), color: "bg-amber-500", text: "text-amber-500" } :
+    { txt: t("Шулы! Назар аударыңыз", "Шумно! Обратите внимание", "Loud! Get attention"), color: "bg-red-500", text: "text-red-500" };
 
   return (
     <div className="glass rounded-2xl p-5">
       <div className="mb-3 flex items-center gap-2">
         <Volume2 className="h-5 w-5 text-primary" />
-        <h3 className="font-semibold">Сынып шу мониторы</h3>
+        <h3 className="font-semibold">{t("Сынып шу мониторы", "Монитор шума в классе", "Classroom noise monitor")}</h3>
       </div>
-      <div className="text-4xl font-semibold tabular-nums">{Math.round(level)} <span className="text-base font-normal text-muted-foreground">дБ</span></div>
+      <div className="text-4xl font-semibold tabular-nums">{Math.round(level)} <span className="text-base font-normal text-muted-foreground">{t("дБ", "дБ", "dB")}</span></div>
       <div className={`mt-1 text-sm font-medium ${status.text}`}>{status.txt}</div>
       <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-muted">
         <div className={`h-full transition-all ${status.color}`} style={{ width: `${Math.min(100, level)}%` }} />
       </div>
       <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
-        <span>0</span><span>45 қауіпсіз</span><span>70 жұмыс</span><span>100</span>
+        <span>0</span><span>45 {t("қауіпсіз", "норма", "safe")}</span><span>70 {t("жұмыс", "работа", "work")}</span><span>100</span>
       </div>
       <Button onClick={() => setRunning(!running)} variant="outline" className="mt-4 w-full">
-        {running ? "Тоқтату" : "Бастау"}
+        {running ? t("Тоқтату", "Остановить", "Stop") : t("Бастау", "Запустить", "Start")}
       </Button>
     </div>
   );
 }
 
 function LessonTimer() {
+  const t = useT();
   const [seconds, setSeconds] = useState(300);
   const [left, setLeft] = useState(300);
   const [running, setRunning] = useState(false);
@@ -178,7 +182,7 @@ function LessonTimer() {
 
   return (
     <div className="glass rounded-2xl p-5">
-      <h3 className="mb-3 font-semibold">Сабақ таймері</h3>
+      <h3 className="mb-3 font-semibold">{t("Сабақ таймері", "Таймер урока", "Lesson timer")}</h3>
       <div className="relative mx-auto flex h-36 w-36 items-center justify-center">
         <svg className="absolute inset-0" viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="44" className="fill-none stroke-muted" strokeWidth="6" />
@@ -188,12 +192,12 @@ function LessonTimer() {
       </div>
       <div className="mt-4 flex justify-center gap-1.5">
         {[180, 300, 600].map((sec) => (
-          <Button key={sec} size="sm" variant="outline" onClick={() => set(sec)}>{sec / 60} мин</Button>
+          <Button key={sec} size="sm" variant="outline" onClick={() => set(sec)}>{sec / 60} {t("мин", "мин", "min")}</Button>
         ))}
       </div>
       <div className="mt-3 flex gap-2">
         <Button onClick={() => setRunning(!running)} className="flex-1 gradient-emerald gap-1.5">
-          {running ? <><Pause className="h-4 w-4" /> Тоқтату</> : <><Play className="h-4 w-4" /> Бастау</>}
+          {running ? <><Pause className="h-4 w-4" /> {t("Тоқтату", "Пауза", "Pause")}</> : <><Play className="h-4 w-4" /> {t("Бастау", "Старт", "Start")}</>}
         </Button>
         <Button variant="outline" onClick={() => set(seconds)}><RotateCcw className="h-4 w-4" /></Button>
       </div>
