@@ -138,18 +138,21 @@ export function AdiletAI() {
 }
 
 function ComplaintConstructor() {
+  const t = useT();
+  const { user } = useAppStoreCompat();
   const [school, setSchool] = useState("");
   const [director, setDirector] = useState("");
-  const [teacher, setTeacher] = useState("Суханберді Қарлығаш");
+  const [teacher, setTeacher] = useState(user?.fullName ?? "");
   const [violation, setViolation] = useState<string>("");
   const [generated, setGenerated] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   const generate = () => {
     if (!school || !director || !violation) {
-      toast.error("Барлық өрістерді толтырыңыз");
+      toast.error(t("Барлық өрістерді толтырыңыз", "Заполните все поля", "Fill in all fields"));
       return;
     }
+
     const date = new Date().toLocaleDateString("kk-KZ");
     const text = `ҚАЗАҚСТАН РЕСПУБЛИКАСЫНЫҢ
 БІЛІМ БЕРУ САЛАСЫНДАҒЫ БАҚЫЛАУ КОМИТЕТІНЕ
@@ -182,7 +185,7 @@ function ComplaintConstructor() {
 
   const copy = () => {
     navigator.clipboard.writeText(generated);
-    toast.success("Көшірілді");
+    toast.success(t("Көшірілді", "Скопировано", "Copied"));
   };
 
   const print = () => {
@@ -196,33 +199,35 @@ function ComplaintConstructor() {
 
   return (
     <div className="glass rounded-2xl p-5">
-      <h3 className="mb-1 font-semibold">Ресми шағым конструкторы</h3>
-      <p className="mb-4 text-xs text-muted-foreground">Заңды формада хат құрастырыңыз</p>
+      <h3 className="mb-1 font-semibold">{t("Ресми шағым конструкторы", "Конструктор официальной жалобы", "Official complaint builder")}</h3>
+      <p className="mb-4 text-xs text-muted-foreground">{t("Заңды формада хат құрастырыңыз", "Составьте письмо в законной форме", "Compose a letter in legal form")}</p>
       <div className="space-y-3">
         <div>
-          <Label className="text-xs">Мектеп атауы</Label>
-          <Input value={school} onChange={(e) => setSchool(e.target.value)} placeholder="№1 жалпы білім беретін мектеп" />
+          <Label className="text-xs">{t("Мектеп атауы", "Название школы", "School name")}</Label>
+          <Input value={school} onChange={(e) => setSchool(e.target.value)} placeholder={t("№1 жалпы білім беретін мектеп", "Школа №1", "School No. 1")} />
         </div>
         <div>
-          <Label className="text-xs">Директор</Label>
-          <Input value={director} onChange={(e) => setDirector(e.target.value)} placeholder="А.Ә.Т." />
+          <Label className="text-xs">{t("Директор", "Директор", "Director")}</Label>
+          <Input value={director} onChange={(e) => setDirector(e.target.value)} placeholder={t("А.Ә.Т.", "Ф.И.О.", "Full name")} />
         </div>
         <div>
-          <Label className="text-xs">Педагог</Label>
+          <Label className="text-xs">{t("Педагог", "Педагог", "Teacher")}</Label>
           <Input value={teacher} onChange={(e) => setTeacher(e.target.value)} />
         </div>
         <div>
-          <Label className="text-xs">Бұзушылық түрі</Label>
+          <Label className="text-xs">{t("Бұзушылық түрі", "Тип нарушения", "Violation type")}</Label>
           <Select value={violation} onValueChange={setViolation}>
-            <SelectTrigger><SelectValue placeholder="Таңдаңыз" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t("Таңдаңыз", "Выберите", "Select")} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="Сенбі күні мәжбүрлі тазалау жұмыстарына тарту">Сенбі күні мәжбүрлі тазалау</SelectItem>
-              <SelectItem value="Артық қағазбастылық пен есеп беруді талап ету">Артық қағазбастылық</SelectItem>
-              <SelectItem value="Газет-журналдарға мәжбүрлі жазылу">Мәжбүрлі жазылу</SelectItem>
+              <SelectItem value="Сенбі күні мәжбүрлі тазалау жұмыстарына тарту">{t("Сенбі күні мәжбүрлі тазалау", "Принуждение к субботнику", "Forced Saturday work")}</SelectItem>
+              <SelectItem value="Артық қағазбастылық пен есеп беруді талап ету">{t("Артық қағазбастылық", "Излишняя бюрократия", "Excess paperwork")}</SelectItem>
+              <SelectItem value="Газет-журналдарға мәжбүрлі жазылу">{t("Мәжбүрлі жазылу", "Принудительная подписка", "Forced subscription")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={generate} className="w-full gradient-emerald">Хат құрастыру</Button>
+        <Button onClick={generate} className="w-full gradient-emerald">{t("Хат құрастыру", "Сформировать письмо", "Generate letter")}</Button>
+
+
 
         {generated && (
           <>
