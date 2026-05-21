@@ -3,23 +3,30 @@ import { Play, CheckCircle2, Award, X, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAppStore } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 import { toast } from "sonner";
 
-const COURSES = [
-  { id: 1, title: "Педагогикалық құқық негіздері", hours: 24, lectures: 12, level: "Базалық" },
-  { id: 2, title: "Заманауи цифрлық сабақ", hours: 32, lectures: 16, level: "Орта" },
-  { id: 3, title: "STEM бағытындағы әдістеме", hours: 40, lectures: 20, level: "Жоғары" },
-];
-
-const QUIZ = [
-  { q: "514-бұйрық бойынша педагог күнделікті қанша құжат толтырады?", opts: ["1", "2", "3", "5"], a: 1 },
-  { q: "«Педагог мәртебесі туралы» заң бойынша сенбілік мәжбүрлеу:", opts: ["Рұқсат етіледі", "Тыйым салынған", "Тек директор шешімімен", "Облыс әкімі бекітеді"], a: 1 },
-  { q: "Артық қағазбастылық туралы талап кімге жолданады?", opts: ["Парламентке", "Білім бақылау комитетіне", "Полицияға", "Сотқа тікелей"], a: 1 },
-  { q: "Мәжбүрлі жазылым (подписка) — қандай заң бұзу?", opts: ["Әкімшілік", "Сыбайлас жемқорлыққа қарсы заңды", "Еңбек кодексі", "Барлығы"], a: 3 },
-  { q: "Педагогтың жұмыс уақыты не үшін арналған?", opts: ["Қосымша есеп беру", "Жиналыс", "Оқыту мен дайындалу", "Әкімшілік тапсырмалар"], a: 2 },
-];
-
 export function Academy() {
+  const t = useT();
+  const COURSES = [
+    { id: 1, title: t("Педагогикалық құқық негіздері", "Основы педагогического права", "Foundations of educational law"), hours: 24, lectures: 12, level: t("Базалық", "Базовый", "Basic") },
+    { id: 2, title: t("Заманауи цифрлық сабақ", "Современный цифровой урок", "Modern digital lesson"),               hours: 32, lectures: 16, level: t("Орта", "Средний", "Intermediate") },
+    { id: 3, title: t("STEM бағытындағы әдістеме", "Методика по направлению STEM", "STEM methodology"),               hours: 40, lectures: 20, level: t("Жоғары", "Продвинутый", "Advanced") },
+  ];
+
+  const QUIZ = [
+    { q: t("514-бұйрық бойынша педагог күнделікті қанша құжат толтырады?", "Сколько ежедневных документов заполняет педагог по приказу 514?", "How many daily documents does a teacher fill under order 514?"),
+      opts: ["1", "2", "3", "5"], a: 1 },
+    { q: t("«Педагог мәртебесі туралы» заң бойынша сенбілік мәжбүрлеу:", "По закону «О статусе педагога» принуждение к субботнику:", "Under the 'Teacher Status' law, mandatory Saturday work is:"),
+      opts: [t("Рұқсат етіледі", "Разрешено", "Allowed"), t("Тыйым салынған", "Запрещено", "Forbidden"), t("Тек директор шешімімен", "Только по решению директора", "Only by director's order"), t("Облыс әкімі бекітеді", "Утверждает аким области", "Approved by the regional akim")], a: 1 },
+    { q: t("Артық қағазбастылық туралы талап кімге жолданады?", "Жалоба на излишнюю бюрократию направляется:", "Complaints about excess paperwork are filed with:"),
+      opts: [t("Парламентке", "В Парламент", "Parliament"), t("Білім бақылау комитетіне", "В Комитет контроля образования", "Education Control Committee"), t("Полицияға", "В полицию", "Police"), t("Сотқа тікелей", "Сразу в суд", "Directly to court")], a: 1 },
+    { q: t("Мәжбүрлі жазылым (подписка) — қандай заң бұзу?", "Принудительная подписка — нарушение какого закона?", "Forced subscriptions violate which law?"),
+      opts: [t("Әкімшілік", "Административный", "Administrative"), t("Сыбайлас жемқорлыққа қарсы заңды", "Антикоррупционный", "Anti-corruption"), t("Еңбек кодексі", "Трудовой кодекс", "Labor code"), t("Барлығы", "Все вместе", "All of the above")], a: 3 },
+    { q: t("Педагогтың жұмыс уақыты не үшін арналған?", "На что предназначено рабочее время педагога?", "What is a teacher's working time for?"),
+      opts: [t("Қосымша есеп беру", "Доп. отчётность", "Extra reporting"), t("Жиналыс", "Собрания", "Meetings"), t("Оқыту мен дайындалу", "Обучение и подготовка", "Teaching and preparation"), t("Әкімшілік тапсырмалар", "Адм. поручения", "Admin tasks")], a: 2 },
+  ];
+
   const [quizOpen, setQuizOpen] = useState(false);
   const [certOpen, setCertOpen] = useState(false);
   const [step, setStep] = useState(0);
@@ -38,9 +45,9 @@ export function Academy() {
         addPoints(200);
         incrementCertificates();
         setCertOpen(true);
-        toast.success(`+200 ұпай! Сертификат алдыңыз (${score}/5)`);
+        toast.success(t(`+200 ұпай! Сертификат алдыңыз (${score}/5)`, `+200 баллов! Вы получили сертификат (${score}/5)`, `+200 points! Certificate earned (${score}/5)`));
       } else {
-        toast.error(`Өкінішке орай ${score}/5. Қайталап көріңіз`);
+        toast.error(t(`Өкінішке орай ${score}/5. Қайталап көріңіз`, `К сожалению ${score}/5. Попробуйте ещё раз`, `Sorry, ${score}/5. Try again`));
       }
     }
   };
@@ -48,8 +55,8 @@ export function Academy() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Академия</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Кәсіби сертификаттау курстары</p>
+        <h1 className="text-3xl font-semibold tracking-tight">{t("Академия", "Академия", "Academy")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("Кәсіби сертификаттау курстары", "Курсы профессиональной сертификации", "Professional certification courses")}</p>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-3">
@@ -65,8 +72,8 @@ export function Academy() {
             <div className="p-5">
               <h3 className="text-base font-semibold">{c.title}</h3>
               <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
-                <span>{c.hours} сағат</span>
-                <span>{c.lectures} дәріс</span>
+                <span>{c.hours} {t("сағат", "часов", "hours")}</span>
+                <span>{c.lectures} {t("дәріс", "лекций", "lectures")}</span>
               </div>
             </div>
           </div>
@@ -80,10 +87,16 @@ export function Academy() {
             <Award className="h-7 w-7 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-semibold">Сертификаттау емтиханы</h3>
-            <p className="mt-1 text-sm text-muted-foreground">5 сұрақ · педагогикалық құқық · табысты тапсырғанда +200 ұпай мен сертификат</p>
+            <h3 className="text-xl font-semibold">{t("Сертификаттау емтиханы", "Сертификационный экзамен", "Certification exam")}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t(
+                "5 сұрақ · педагогикалық құқық · табысты тапсырғанда +200 ұпай мен сертификат",
+                "5 вопросов · педагогическое право · при успехе +200 баллов и сертификат",
+                "5 questions · educational law · pass to earn +200 points and a certificate",
+              )}
+            </p>
           </div>
-          <Button onClick={start} className="gradient-emerald shadow-lg shadow-primary/30">Емтиханды бастау</Button>
+          <Button onClick={start} className="gradient-emerald shadow-lg shadow-primary/30">{t("Емтиханды бастау", "Начать экзамен", "Start exam")}</Button>
         </div>
       </div>
 
@@ -91,7 +104,7 @@ export function Academy() {
       <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
         <DialogContent className="max-w-lg">
           <div className="mb-4 flex items-center justify-between">
-            <div className="text-xs font-medium text-muted-foreground">Сұрақ {step + 1} / {QUIZ.length}</div>
+            <div className="text-xs font-medium text-muted-foreground">{t("Сұрақ", "Вопрос", "Question")} {step + 1} / {QUIZ.length}</div>
             <div className="flex gap-1">
               {QUIZ.map((_, i) => (
                 <div key={i} className={`h-1 w-8 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`} />
@@ -120,6 +133,7 @@ export function Academy() {
 }
 
 function Certificate({ name, onClose }: { name: string; onClose: () => void }) {
+  const t = useT();
   const id = "QTA-" + Math.random().toString(36).slice(2, 8).toUpperCase();
   const print = () => window.print();
   return (
@@ -131,46 +145,49 @@ function Certificate({ name, onClose }: { name: string; onClose: () => void }) {
         <div className="absolute inset-0 border-[12px] border-double border-emerald-600/30 rounded-2xl pointer-events-none" />
         <div className="text-center">
           <div className="text-xs uppercase tracking-[0.3em] text-emerald-700">Qazaq Teachers AI</div>
-          <h2 className="mt-3 font-serif text-4xl font-bold">Сертификат</h2>
-          <div className="mt-1 text-sm text-slate-600">Кәсіби біліктілікті растайтын құжат</div>
+          <h2 className="mt-3 font-serif text-4xl font-bold">{t("Сертификат", "Сертификат", "Certificate")}</h2>
+          <div className="mt-1 text-sm text-slate-600">{t("Кәсіби біліктілікті растайтын құжат", "Документ, подтверждающий квалификацию", "Document certifying professional qualification")}</div>
 
           <div className="my-8">
-            <div className="text-sm text-slate-500">Осы куәлік төмендегі тұлғаға беріледі</div>
+            <div className="text-sm text-slate-500">{t("Осы куәлік төмендегі тұлғаға беріледі", "Настоящий сертификат выдан", "This certificate is awarded to")}</div>
             <div className="mt-3 font-serif text-3xl font-semibold text-emerald-800">{name}</div>
             <div className="mx-auto mt-2 h-0.5 w-48 bg-emerald-600/40" />
             <p className="mx-auto mt-4 max-w-md text-sm text-slate-600">
-              «Педагогикалық құқық негіздері» курсын табысты тәмамдағаны үшін
+              {t(
+                "«Педагогикалық құқық негіздері» курсын табысты тәмамдағаны үшін",
+                "за успешное завершение курса «Основы педагогического права»",
+                "for successful completion of the 'Foundations of Educational Law' course",
+              )}
             </p>
           </div>
 
           <div className="flex items-end justify-between gap-6">
             <div className="text-left text-xs text-slate-500">
-              <div className="font-semibold text-slate-700">Күні</div>
+              <div className="font-semibold text-slate-700">{t("Күні", "Дата", "Date")}</div>
               <div>{new Date().toLocaleDateString("kk-KZ")}</div>
               <div className="mt-2 font-semibold text-slate-700">ID</div>
               <div>{id}</div>
             </div>
             <div className="flex flex-col items-center">
               <QRGraphic id={id} />
-              <div className="mt-1 text-[10px] text-slate-500">QR верификация</div>
+              <div className="mt-1 text-[10px] text-slate-500">{t("QR верификация", "QR верификация", "QR verification")}</div>
             </div>
             <div className="text-right text-xs text-slate-500">
               <div className="font-script text-2xl italic text-emerald-800">Qazaq Teachers</div>
               <div className="mt-1 h-px w-24 bg-slate-400 ml-auto" />
-              <div>Платформа директоры</div>
+              <div>{t("Платформа директоры", "Директор платформы", "Platform Director")}</div>
             </div>
           </div>
         </div>
       </div>
       <div className="mt-3 flex justify-center gap-2">
-        <Button onClick={print} className="gradient-emerald gap-2"><Printer className="h-4 w-4" /> Басып шығару</Button>
+        <Button onClick={print} className="gradient-emerald gap-2"><Printer className="h-4 w-4" /> {t("Басып шығару", "Печать", "Print")}</Button>
       </div>
     </div>
   );
 }
 
 function QRGraphic({ id }: { id: string }) {
-  // Deterministic 12x12 pseudo-QR derived from id
   const size = 12;
   const cells: boolean[] = [];
   let h = 0;
