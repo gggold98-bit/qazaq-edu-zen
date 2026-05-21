@@ -13,7 +13,11 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { useT } from "@/lib/i18n";
+import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
+
+
 
 interface Msg { role: "user" | "ai"; text: string }
 
@@ -37,8 +41,13 @@ const KNOWLEDGE = [
 ];
 
 export function AdiletAI() {
+  const t = useT();
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "ai", text: "Сәлеметсіз бе! Мен — Adilet AI, ҚР білім беру және еңбек құқығы бойынша көмекшіңіз. Сұрағыңызды қойыңыз." },
+    { role: "ai", text: t(
+      "Сәлеметсіз бе! Мен — Adilet AI, ҚР білім беру және еңбек құқығы бойынша көмекшіңіз. Сұрағыңызды қойыңыз.",
+      "Здравствуйте! Я — Adilet AI, ваш помощник по образовательному и трудовому праву РК. Задайте свой вопрос.",
+      "Hello! I'm Adilet AI, your assistant for Kazakhstan's education and labor law. Ask me anything.",
+    ) },
   ]);
   const [input, setInput] = useState("");
 
@@ -52,8 +61,12 @@ export function AdiletAI() {
         userMsg.toLowerCase().split(/\s+/).some((w) => k.q.toLowerCase().includes(w) || k.a.toLowerCase().includes(w)),
       );
       const reply = match
-        ? `Заң негізінде жауап:\n\n${match.a}\n\n📎 Дереккөз: ${match.q}`
-        : "Сұрағыңыз бойынша нақты дереккөз табылмады. «514 бұйрық», «сенбілік», «жазылым» немесе «педагог мәртебесі» тақырыптарын қарап көріңіз.";
+        ? `${t("Заң негізінде жауап", "Ответ на основании закона", "Answer based on law")}:\n\n${match.a}\n\n📎 ${t("Дереккөз", "Источник", "Source")}: ${match.q}`
+        : t(
+            "Сұрағыңыз бойынша нақты дереккөз табылмады. «514 бұйрық», «сенбілік», «жазылым» немесе «педагог мәртебесі» тақырыптарын қарап көріңіз.",
+            "По вашему вопросу источник не найден. Попробуйте темы: «приказ 514», «субботник», «подписка», «статус педагога».",
+            "No source found for your query. Try: 'order 514', 'Saturday work', 'subscription', 'teacher status'.",
+          );
       setMessages((m) => [...m, { role: "ai", text: reply }]);
     }, 600);
   };
@@ -67,13 +80,14 @@ export function AdiletAI() {
             <Scale className="h-5 w-5 text-white" />
           </div>
           <div>
-            <div className="font-semibold">Adilet AI — Құқықтық заңгер</div>
-            <div className="text-xs text-muted-foreground">ҚР Білім беру мен еңбек заңнамасы</div>
+            <div className="font-semibold">{t("Adilet AI — Құқықтық заңгер", "Adilet AI — Правовой консультант", "Adilet AI — Legal counsel")}</div>
+            <div className="text-xs text-muted-foreground">{t("ҚР Білім беру мен еңбек заңнамасы", "Образовательное и трудовое право РК", "Kazakhstan education & labor law")}</div>
           </div>
           <span className="ml-auto flex items-center gap-1.5 text-xs text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Онлайн
+            <Sparkles className="h-3.5 w-3.5" /> {t("Онлайн", "Онлайн", "Online")}
           </span>
         </div>
+
 
         <div className="flex-1 space-y-4 overflow-y-auto p-5">
           {messages.map((m, i) => (
@@ -91,15 +105,16 @@ export function AdiletAI() {
         <div className="border-t border-glass-border p-4">
           <div className="flex gap-2">
             <Input
-              placeholder="Заң туралы сұрақ қойыңыз..."
+              placeholder={t("Заң туралы сұрақ қойыңыз...", "Задайте вопрос о законе...", "Ask a question about the law...")}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && ask()}
               className="h-11"
             />
             <Button onClick={ask} className="h-11 gradient-emerald gap-2">
-              <Send className="h-4 w-4" /> Жіберу
+              <Send className="h-4 w-4" /> {t("Жіберу", "Отправить", "Send")}
             </Button>
+
           </div>
         </div>
       </div>
@@ -107,7 +122,7 @@ export function AdiletAI() {
       {/* Side */}
       <div className="space-y-6 lg:col-span-2">
         <div className="glass rounded-2xl p-5">
-          <h3 className="mb-3 font-semibold">Маңызды заң баптары</h3>
+          <h3 className="mb-3 font-semibold">{t("Маңызды заң баптары", "Важные статьи закона", "Key legal articles")}</h3>
           <Accordion type="single" collapsible className="w-full">
             {KNOWLEDGE.map((k, i) => (
               <AccordionItem key={i} value={`item-${i}`} className="border-b-border/60">
@@ -125,18 +140,22 @@ export function AdiletAI() {
 }
 
 function ComplaintConstructor() {
+  const t = useT();
+  const user = useAppStore((s) => s.user);
+
   const [school, setSchool] = useState("");
   const [director, setDirector] = useState("");
-  const [teacher, setTeacher] = useState("Суханберді Қарлығаш");
+  const [teacher, setTeacher] = useState(user?.fullName ?? "");
   const [violation, setViolation] = useState<string>("");
   const [generated, setGenerated] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   const generate = () => {
     if (!school || !director || !violation) {
-      toast.error("Барлық өрістерді толтырыңыз");
+      toast.error(t("Барлық өрістерді толтырыңыз", "Заполните все поля", "Fill in all fields"));
       return;
     }
+
     const date = new Date().toLocaleDateString("kk-KZ");
     const text = `ҚАЗАҚСТАН РЕСПУБЛИКАСЫНЫҢ
 БІЛІМ БЕРУ САЛАСЫНДАҒЫ БАҚЫЛАУ КОМИТЕТІНЕ
@@ -169,7 +188,7 @@ function ComplaintConstructor() {
 
   const copy = () => {
     navigator.clipboard.writeText(generated);
-    toast.success("Көшірілді");
+    toast.success(t("Көшірілді", "Скопировано", "Copied"));
   };
 
   const print = () => {
@@ -183,33 +202,35 @@ function ComplaintConstructor() {
 
   return (
     <div className="glass rounded-2xl p-5">
-      <h3 className="mb-1 font-semibold">Ресми шағым конструкторы</h3>
-      <p className="mb-4 text-xs text-muted-foreground">Заңды формада хат құрастырыңыз</p>
+      <h3 className="mb-1 font-semibold">{t("Ресми шағым конструкторы", "Конструктор официальной жалобы", "Official complaint builder")}</h3>
+      <p className="mb-4 text-xs text-muted-foreground">{t("Заңды формада хат құрастырыңыз", "Составьте письмо в законной форме", "Compose a letter in legal form")}</p>
       <div className="space-y-3">
         <div>
-          <Label className="text-xs">Мектеп атауы</Label>
-          <Input value={school} onChange={(e) => setSchool(e.target.value)} placeholder="№1 жалпы білім беретін мектеп" />
+          <Label className="text-xs">{t("Мектеп атауы", "Название школы", "School name")}</Label>
+          <Input value={school} onChange={(e) => setSchool(e.target.value)} placeholder={t("№1 жалпы білім беретін мектеп", "Школа №1", "School No. 1")} />
         </div>
         <div>
-          <Label className="text-xs">Директор</Label>
-          <Input value={director} onChange={(e) => setDirector(e.target.value)} placeholder="А.Ә.Т." />
+          <Label className="text-xs">{t("Директор", "Директор", "Director")}</Label>
+          <Input value={director} onChange={(e) => setDirector(e.target.value)} placeholder={t("А.Ә.Т.", "Ф.И.О.", "Full name")} />
         </div>
         <div>
-          <Label className="text-xs">Педагог</Label>
+          <Label className="text-xs">{t("Педагог", "Педагог", "Teacher")}</Label>
           <Input value={teacher} onChange={(e) => setTeacher(e.target.value)} />
         </div>
         <div>
-          <Label className="text-xs">Бұзушылық түрі</Label>
+          <Label className="text-xs">{t("Бұзушылық түрі", "Тип нарушения", "Violation type")}</Label>
           <Select value={violation} onValueChange={setViolation}>
-            <SelectTrigger><SelectValue placeholder="Таңдаңыз" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t("Таңдаңыз", "Выберите", "Select")} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="Сенбі күні мәжбүрлі тазалау жұмыстарына тарту">Сенбі күні мәжбүрлі тазалау</SelectItem>
-              <SelectItem value="Артық қағазбастылық пен есеп беруді талап ету">Артық қағазбастылық</SelectItem>
-              <SelectItem value="Газет-журналдарға мәжбүрлі жазылу">Мәжбүрлі жазылу</SelectItem>
+              <SelectItem value="Сенбі күні мәжбүрлі тазалау жұмыстарына тарту">{t("Сенбі күні мәжбүрлі тазалау", "Принуждение к субботнику", "Forced Saturday work")}</SelectItem>
+              <SelectItem value="Артық қағазбастылық пен есеп беруді талап ету">{t("Артық қағазбастылық", "Излишняя бюрократия", "Excess paperwork")}</SelectItem>
+              <SelectItem value="Газет-журналдарға мәжбүрлі жазылу">{t("Мәжбүрлі жазылу", "Принудительная подписка", "Forced subscription")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={generate} className="w-full gradient-emerald">Хат құрастыру</Button>
+        <Button onClick={generate} className="w-full gradient-emerald">{t("Хат құрастыру", "Сформировать письмо", "Generate letter")}</Button>
+
+
 
         {generated && (
           <>
