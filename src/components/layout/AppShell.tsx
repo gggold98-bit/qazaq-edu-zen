@@ -15,6 +15,10 @@ import {
   ShieldCheck,
   Menu,
   X,
+  FileText,
+  ClipboardList,
+  Trophy,
+  Mic,
 } from "lucide-react";
 import { useAppStore, type TabKey } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -32,7 +36,7 @@ import { AdiletAI } from "@/components/modules/AdiletAI";
 import { Methodology } from "@/components/modules/Methodology";
 import { Whiteboard } from "@/components/modules/Whiteboard";
 import { LibraryModule } from "@/components/modules/LibraryModule";
-import { Academy } from "@/components/modules/Academy";
+import { ComingSoon } from "@/components/modules/ComingSoon";
 import { Subscriptions } from "@/components/modules/Subscriptions";
 import { AdminUploader } from "@/components/modules/AdminUploader";
 
@@ -56,10 +60,14 @@ export function AppShell() {
   const NAV: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { key: "dashboard",     label: t("Басты бет",                "Главная",                  "Home"),                 icon: LayoutDashboard },
     { key: "adilet",        label: t("Adilet AI",                "Adilet AI",                "Adilet AI"),            icon: Scale },
+    { key: "ai-kmj",        label: t("AI ҚМЖ",                   "AI КСП",                   "AI Short Plans"),       icon: FileText },
+    { key: "ai-bzhb",       label: t("AI БЖБ-ТЖБ",               "AI СОР-СОЧ",               "AI Assessments"),       icon: ClipboardList },
+    { key: "ai-olympiad",   label: t("AI Олимпиадаға дайындық",  "AI Подготовка к олимпиаде","AI Olympiad prep"),     icon: Trophy },
+    { key: "courses",       label: t("Курстар",                  "Курсы",                    "Courses"),              icon: GraduationCap },
+    { key: "podcasts",      label: t("Подкасттар",               "Подкасты",                 "Podcasts"),             icon: Mic },
     { key: "methodology",   label: t("Әдістемелік кабинет",      "Методический кабинет",     "Methodology cabinet"),  icon: BookOpen },
     { key: "whiteboard",    label: t("AI Интерактивті тақта",    "AI Интерактивная доска",   "AI Interactive board"), icon: PenTool },
     { key: "library",       label: t("AI Кітапхана",             "AI Библиотека",            "AI Library"),           icon: Library },
-    { key: "academy",       label: t("Академия",                 "Академия",                 "Academy"),              icon: GraduationCap },
     { key: "subscriptions", label: t("Жазылымдар",               "Подписки",                 "Subscriptions"),        icon: CreditCard },
   ];
 
@@ -189,10 +197,14 @@ export function AppShell() {
             >
               {activeKey === "dashboard" && <Dashboard />}
               {activeKey === "adilet" && <AdiletAI />}
+              {activeKey === "ai-kmj" && <ComingSoon title={t("AI ҚМЖ", "AI КСП", "AI Short Plans")} />}
+              {activeKey === "ai-bzhb" && <ComingSoon title={t("AI БЖБ-ТЖБ", "AI СОР-СОЧ", "AI Assessments")} />}
+              {activeKey === "ai-olympiad" && <ComingSoon title={t("AI Олимпиадаға дайындық", "AI Подготовка к олимпиаде", "AI Olympiad prep")} />}
+              {activeKey === "courses" && <ComingSoon title={t("Курстар", "Курсы", "Courses")} />}
+              {activeKey === "podcasts" && <ComingSoon title={t("Подкасттар", "Подкасты", "Podcasts")} />}
               {activeKey === "methodology" && <Methodology />}
               {activeKey === "whiteboard" && <Whiteboard />}
               {activeKey === "library" && <LibraryModule />}
-              {activeKey === "academy" && <Academy />}
               {activeKey === "subscriptions" && <Subscriptions />}
               {activeKey === "admin" && <AdminUploader />}
             </motion.div>
