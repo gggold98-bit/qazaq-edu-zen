@@ -109,6 +109,15 @@ export function Whiteboard() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [noiseThreshold, setNoiseThreshold] = useState(75);
   const [violations, setViolations] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [fullscreen]);
 
   const toggleMute = () => {
     setMuted((m) => {
@@ -117,6 +126,101 @@ export function Whiteboard() {
       return next;
     });
   };
+
+  const tools = (
+    <div className="space-y-6">
+      <NoiseMonitor
+        threshold={noiseThreshold}
+        violations={violations}
+        onViolation={() => setViolations((v) => v + 1)}
+      />
+      <LessonTimer />
+      <StudentPicker />
+    </div>
+  );
+
+  if (fullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col gap-3 bg-background p-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Pencil className="h-5 w-5 text-primary" />
+            <h1 className="text-lg font-semibold">AI Интерактивті тақта</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={toggleMute} className="rounded-full gap-1.5">
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              <span className="hidden sm:inline">{muted ? "Дыбыс өшірулі" : "Дыбыс қосулы"}</span>
+            </Button>
+            <Button
+              variant={panelOpen ? "default" : "outline"}
+              size="sm"
+              onClick={() => setPanelOpen((p) => !p)}
+              className={`rounded-full gap-1.5 ${panelOpen ? "gradient-emerald" : ""}`}
+            >
+              <PanelRightOpen className="h-4 w-4" />
+              <span className="hidden sm:inline">Құралдар</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)} className="rounded-full gap-1.5">
+              <Settings className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setFullscreen(false)} className="rounded-full gap-1.5">
+              <Minimize2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Шығу</span>
+            </Button>
+          </div>
+        </div>
+
+        <div className="relative min-h-0 flex-1">
+          <Canvas fullscreen onToggleFullscreen={() => setFullscreen(false)} />
+
+          <AnimatePresence>
+            {panelOpen && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setPanelOpen(false)}
+                  className="absolute inset-0 bg-black/20"
+                />
+                <motion.aside
+                  initial={{ x: 380, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 380, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 240, damping: 28 }}
+                  className="absolute right-0 top-0 bottom-0 w-[360px] max-w-[92vw] overflow-y-auto rounded-2xl glass-strong p-3 shadow-2xl"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground">Сабақ құралдары</span>
+                    <button
+                      onClick={() => setPanelOpen(false)}
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full hover:bg-primary/15"
+                      aria-label="Жабу"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {tools}
+                </motion.aside>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <SettingsModal
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
+          threshold={noiseThreshold}
+          onThresholdChange={setNoiseThreshold}
+          violations={violations}
+          onResetViolations={() => setViolations(0)}
+          muted={muted}
+          onMutedChange={(v) => { setMuted(v); audio.setMuted(v); }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -128,6 +232,9 @@ export function Whiteboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setFullscreen(true)} className="rounded-full gap-1.5">
+            <Maximize2 className="h-4 w-4" /> Толық экран
+          </Button>
           <Button variant="outline" size="sm" onClick={toggleMute} className="rounded-full gap-1.5">
             {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             {muted ? "Дыбыс өшірулі" : "Дыбыс қосулы"}
@@ -139,7 +246,9 @@ export function Whiteboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2"><Canvas /></div>
+        <div className="lg:col-span-2">
+          <Canvas fullscreen={false} onToggleFullscreen={() => setFullscreen(true)} />
+        </div>
         <div className="space-y-6">
           <NoiseMonitor
             threshold={noiseThreshold}
