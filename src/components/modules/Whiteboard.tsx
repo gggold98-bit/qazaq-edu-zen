@@ -926,7 +926,7 @@ function StudentPicker() {
             <DialogTitle className="text-2xl">👥 Топтарға бөлу нәтижесі</DialogTitle>
             <DialogDescription>Оқушылар {groupCount} топқа кездейсоқ бөлінді</DialogDescription>
           </DialogHeader>
-          <div className={`grid gap-3 ${groupCount <= 2 ? "sm:grid-cols-2" : groupCount === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-" + groupCount}`}>
+          <div className={`grid gap-3 ${groupCount === 2 ? "sm:grid-cols-2" : groupCount === 3 ? "sm:grid-cols-3" : groupCount === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-2 lg:grid-cols-5"}`}>
             {groups?.map((g, i) => (
               <motion.div
                 key={i}
