@@ -16,9 +16,8 @@ import {
   Menu,
   X,
   FileText,
-  ClipboardList,
   Trophy,
-  Mic,
+  HelpCircle,
 } from "lucide-react";
 import { useAppStore, type TabKey } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -58,17 +57,16 @@ export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const NAV: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { key: "dashboard",     label: t("Басты бет",                "Главная",                  "Home"),                 icon: LayoutDashboard },
-    { key: "adilet",        label: t("Adilet AI",                "Adilet AI",                "Adilet AI"),            icon: Scale },
-    { key: "ai-kmj",        label: t("AI ҚМЖ",                   "AI КСП",                   "AI Short Plans"),       icon: FileText },
-    { key: "ai-bzhb",       label: t("AI БЖБ-ТЖБ",               "AI СОР-СОЧ",               "AI Assessments"),       icon: ClipboardList },
-    { key: "ai-olympiad",   label: t("AI Олимпиадаға дайындық",  "AI Подготовка к олимпиаде","AI Olympiad prep"),     icon: Trophy },
-    { key: "courses",       label: t("Курстар",                  "Курсы",                    "Courses"),              icon: GraduationCap },
-    { key: "podcasts",      label: t("Подкасттар",               "Подкасты",                 "Podcasts"),             icon: Mic },
-    { key: "methodology",   label: t("Әдістемелік кабинет",      "Методический кабинет",     "Methodology cabinet"),  icon: BookOpen },
-    { key: "whiteboard",    label: t("AI Интерактивті тақта",    "AI Интерактивная доска",   "AI Interactive board"), icon: PenTool },
-    { key: "library",       label: t("AI Кітапхана",             "AI Библиотека",            "AI Library"),           icon: Library },
-    { key: "subscriptions", label: t("Жазылымдар",               "Подписки",                 "Subscriptions"),        icon: CreditCard },
+    { key: "dashboard",      label: t("Басты бет",                "Главная",                  "Home"),                 icon: LayoutDashboard },
+    { key: "adilet",         label: t("Adilet AI",                "Adilet AI",                "Adilet AI"),            icon: Scale },
+    { key: "ai-kmj-bzhb",    label: t("AI ҚМЖ және БЖБ-ТЖБ",      "AI КСП и СОР-СОЧ",         "AI Plans & Assessments"), icon: FileText },
+    { key: "ai-olympiad",    label: t("AI Олимпиадаға дайындық",  "AI Подготовка к олимпиаде","AI Olympiad prep"),     icon: Trophy },
+    { key: "courses-podcasts",label: t("Курстар және Подкасттар",  "Курсы и Подкасты",         "Courses & Podcasts"),   icon: GraduationCap },
+    { key: "qaz-quiz",       label: t("Qaz Quiz",                 "Qaz Quiz",                 "Qaz Quiz"),             icon: HelpCircle },
+    { key: "methodology",    label: t("Әдістемелік кабинет",      "Методический кабинет",     "Methodology cabinet"),  icon: BookOpen },
+    { key: "whiteboard",     label: t("AI Интерактивті тақта",    "AI Интерактивная доска",   "AI Interactive board"), icon: PenTool },
+    { key: "library",        label: t("AI Кітапхана",             "AI Библиотека",            "AI Library"),           icon: Library },
+    { key: "subscriptions",  label: t("Жазылымдар",               "Подписки",                 "Subscriptions"),        icon: CreditCard },
   ];
 
   if (!user) return null;
@@ -197,11 +195,10 @@ export function AppShell() {
             >
               {activeKey === "dashboard" && <Dashboard />}
               {activeKey === "adilet" && <AdiletAI />}
-              {activeKey === "ai-kmj" && <ComingSoon title={t("AI ҚМЖ", "AI КСП", "AI Short Plans")} />}
-              {activeKey === "ai-bzhb" && <ComingSoon title={t("AI БЖБ-ТЖБ", "AI СОР-СОЧ", "AI Assessments")} />}
+              {activeKey === "ai-kmj-bzhb" && <ComingSoon title={t("AI ҚМЖ және БЖБ-ТЖБ", "AI КСП и СОР-СОЧ", "AI Plans & Assessments")} />}
               {activeKey === "ai-olympiad" && <ComingSoon title={t("AI Олимпиадаға дайындық", "AI Подготовка к олимпиаде", "AI Olympiad prep")} />}
-              {activeKey === "courses" && <ComingSoon title={t("Курстар", "Курсы", "Courses")} />}
-              {activeKey === "podcasts" && <ComingSoon title={t("Подкасттар", "Подкасты", "Podcasts")} />}
+              {activeKey === "courses-podcasts" && <ComingSoon title={t("Курстар және Подкасттар", "Курсы и Подкасты", "Courses & Podcasts")} />}
+              {activeKey === "qaz-quiz" && <ComingSoon title={t("Qaz Quiz", "Qaz Quiz", "Qaz Quiz")} />}
               {activeKey === "methodology" && <Methodology />}
               {activeKey === "whiteboard" && <Whiteboard />}
               {activeKey === "library" && <LibraryModule />}
