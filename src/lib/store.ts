@@ -218,7 +218,33 @@ if (typeof window !== "undefined") {
     }
   });
 
-  supabase.auth.getSession().then(({ data }) => {
-    if (!data.session) useAppStore.getState().setAuthReady(true);
+  supabase.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      supabase.auth.signOut().finally(() => {
+        useAppStore.getState().setUser(null);
+        useAppStore.getState().setAuthReady(true);
+      });
+      return;
+    }
+
+    if (!data.session) {
+      useAppStore.getState().setAuthReady(true);
+      return;
+    }
+
+    const u = data.session.user;
+    const meta = (u.user_metadata ?? {}) as Record<string, unknown>;
+    const name =
+      (meta.full_name as string) ||
+      (meta.name as string) ||
+      (u.email ? u.email.split("@")[0] : "Ұстаз");
+    const avatar = (meta.avatar_url as string) || (meta.picture as string);
+
+    hydrateProfile(u.id, u.email ?? "", name, avatar).finally(() =>
+      useAppStore.getState().setAuthReady(true),
+    );
+  }).catch(() => {
+    useAppStore.getState().setUser(null);
+    useAppStore.getState().setAuthReady(true);
   });
 }
