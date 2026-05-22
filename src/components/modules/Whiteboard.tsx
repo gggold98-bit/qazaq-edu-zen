@@ -386,16 +386,24 @@ function Canvas({ fullscreen, onToggleFullscreen }: { fullscreen: boolean; onTog
   };
 
   return (
-    <div className="glass rounded-2xl p-4 relative">
+    <div className={`glass rounded-2xl p-4 relative ${fullscreen ? "flex h-full flex-col" : ""}`}>
       <div className="mb-3 flex items-center gap-2">
         <Pencil className="h-4 w-4 text-primary" />
         <h3 className="font-semibold">Интерактивті тақта</h3>
         <span className="ml-auto text-[11px] text-muted-foreground">
           Құрал: <b className="text-foreground">{tool === "pen" ? "Қалам" : "Өшіргіш"}</b>
         </span>
+        <button
+          onClick={onToggleFullscreen}
+          title={fullscreen ? "Толық экраннан шығу" : "Толық экран"}
+          aria-label={fullscreen ? "Толық экраннан шығу" : "Толық экран"}
+          className="ml-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-primary/15 hover:text-foreground"
+        >
+          {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+        </button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-white relative">
+      <div className={`overflow-hidden rounded-xl border bg-white relative ${fullscreen ? "min-h-0 flex-1" : ""}`}>
         <canvas
           ref={canvasRef}
           onPointerDown={onDown}
@@ -403,9 +411,10 @@ function Canvas({ fullscreen, onToggleFullscreen }: { fullscreen: boolean; onTog
           onPointerUp={onUp}
           onPointerCancel={onUp}
           onPointerLeave={onUp}
-          className="block h-[460px] w-full touch-none"
+          className={`block w-full touch-none ${fullscreen ? "h-full" : "h-[460px]"}`}
           style={{ cursor: tool === "eraser" ? "cell" : "crosshair" }}
         />
+
 
         {/* Floating glass toolbar */}
         <motion.div
