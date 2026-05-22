@@ -15,6 +15,10 @@ import {
   ShieldCheck,
   Menu,
   X,
+  FileText,
+  ClipboardList,
+  Trophy,
+  Mic,
 } from "lucide-react";
 import { useAppStore, type TabKey } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -32,7 +36,7 @@ import { AdiletAI } from "@/components/modules/AdiletAI";
 import { Methodology } from "@/components/modules/Methodology";
 import { Whiteboard } from "@/components/modules/Whiteboard";
 import { LibraryModule } from "@/components/modules/LibraryModule";
-import { Academy } from "@/components/modules/Academy";
+import { ComingSoon } from "@/components/modules/ComingSoon";
 import { Subscriptions } from "@/components/modules/Subscriptions";
 import { AdminUploader } from "@/components/modules/AdminUploader";
 
@@ -193,10 +197,14 @@ export function AppShell() {
             >
               {activeKey === "dashboard" && <Dashboard />}
               {activeKey === "adilet" && <AdiletAI />}
+              {activeKey === "ai-kmj" && <ComingSoon title={t("AI ҚМЖ", "AI КСП", "AI Short Plans")} />}
+              {activeKey === "ai-bzhb" && <ComingSoon title={t("AI БЖБ-ТЖБ", "AI СОР-СОЧ", "AI Assessments")} />}
+              {activeKey === "ai-olympiad" && <ComingSoon title={t("AI Олимпиадаға дайындық", "AI Подготовка к олимпиаде", "AI Olympiad prep")} />}
+              {activeKey === "courses" && <ComingSoon title={t("Курстар", "Курсы", "Courses")} />}
+              {activeKey === "podcasts" && <ComingSoon title={t("Подкасттар", "Подкасты", "Podcasts")} />}
               {activeKey === "methodology" && <Methodology />}
               {activeKey === "whiteboard" && <Whiteboard />}
               {activeKey === "library" && <LibraryModule />}
-              {activeKey === "academy" && <Academy />}
               {activeKey === "subscriptions" && <Subscriptions />}
               {activeKey === "admin" && <AdminUploader />}
             </motion.div>
