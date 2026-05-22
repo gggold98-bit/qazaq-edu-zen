@@ -1,248 +1,346 @@
-import { useRef, useState } from "react";
-import { Scale, Send, Copy, Printer, Sparkles, Bot, User as UserIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import { useServerFn } from "@tanstack/react-start";
+import { Scale, Send, Plus, Trash2, FileText, Bot, User as UserIcon, ShieldCheck, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import { useT } from "@/lib/i18n";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
 import { useAppStore } from "@/lib/store";
+import { adiletChat } from "@/lib/adilet.functions";
 import { toast } from "sonner";
 
-
-
-interface Msg { role: "user" | "ai"; text: string }
-
-const KNOWLEDGE = [
-  {
-    q: "«Педагог мәртебесі туралы» Заң — 15-бап",
-    a: "Педагог қызметкерлерге қосымша құжаттарды жүргізуге, жиналыстарға қатысуға және оқу процесінен тыс іс-шараларға тартуға тыйым салынады. Жұмыс уақыты тек оқыту мен дайындалуға арналады.",
-  },
-  {
-    q: "ҚР БҒМ 514-бұйрық",
-    a: "Педагогтер тек 2 күнделікті құжатты толтырады: 1) Электронды немесе қағаз күнделік (журнал), 2) Қысқа мерзімді жоспар (ҚМЖ). Басқа есеп беру түрлерін талап етуге болмайды.",
-  },
-  {
-    q: "Сенбілік жұмыстар туралы",
-    a: "Сенбі күнгі жалпы жинау, көгалдандыру, мерекелерге дайындық сияқты жұмыстарға педагогтерді мәжбүрлеп тарту заңсыз болып табылады.",
-  },
-  {
-    q: "Жазылым (подписка) және жарна",
-    a: "Қандай да бір баспасөзге, газеттерге немесе қорларға педагогтерді мәжбүрлеп жаздыруға тыйым салынады. Бұл — Сыбайлас жемқорлыққа қарсы заңды бұзу.",
-  },
-];
-
-export function AdiletAI() {
-  const t = useT();
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "ai", text: t(
-      "Сәлеметсіз бе! Мен — Adilet AI, ҚР білім беру және еңбек құқығы бойынша көмекшіңіз. Сұрағыңызды қойыңыз.",
-      "Здравствуйте! Я — Adilet AI, ваш помощник по образовательному и трудовому праву РК. Задайте свой вопрос.",
-      "Hello! I'm Adilet AI, your assistant for Kazakhstan's education and labor law. Ask me anything.",
-    ) },
-  ]);
-  const [input, setInput] = useState("");
-
-  const ask = () => {
-    if (!input.trim()) return;
-    const userMsg = input;
-    setMessages((m) => [...m, { role: "user", text: userMsg }]);
-    setInput("");
-    setTimeout(() => {
-      const match = KNOWLEDGE.find((k) =>
-        userMsg.toLowerCase().split(/\s+/).some((w) => k.q.toLowerCase().includes(w) || k.a.toLowerCase().includes(w)),
-      );
-      const reply = match
-        ? `${t("Заң негізінде жауап", "Ответ на основании закона", "Answer based on law")}:\n\n${match.a}\n\n📎 ${t("Дереккөз", "Источник", "Source")}: ${match.q}`
-        : t(
-            "Сұрағыңыз бойынша нақты дереккөз табылмады. «514 бұйрық», «сенбілік», «жазылым» немесе «педагог мәртебесі» тақырыптарын қарап көріңіз.",
-            "По вашему вопросу источник не найден. Попробуйте темы: «приказ 514», «субботник», «подписка», «статус педагога».",
-            "No source found for your query. Try: 'order 514', 'Saturday work', 'subscription', 'teacher status'.",
-          );
-      setMessages((m) => [...m, { role: "ai", text: reply }]);
-    }, 600);
-  };
-
-  return (
-    <div className="grid gap-6 lg:grid-cols-5">
-      {/* Chat */}
-      <div className="glass flex h-[680px] flex-col rounded-2xl lg:col-span-3">
-        <div className="flex items-center gap-3 border-b border-glass-border p-5">
-          <div className="gradient-emerald flex h-10 w-10 items-center justify-center rounded-xl shadow-lg shadow-primary/30">
-            <Scale className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <div className="font-semibold">{t("Adilet AI — Құқықтық заңгер", "Adilet AI — Правовой консультант", "Adilet AI — Legal counsel")}</div>
-            <div className="text-xs text-muted-foreground">{t("ҚР Білім беру мен еңбек заңнамасы", "Образовательное и трудовое право РК", "Kazakhstan education & labor law")}</div>
-          </div>
-          <span className="ml-auto flex items-center gap-1.5 text-xs text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> {t("Онлайн", "Онлайн", "Online")}
-          </span>
-        </div>
-
-
-        <div className="flex-1 space-y-4 overflow-y-auto p-5">
-          {messages.map((m, i) => (
-            <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${m.role === "ai" ? "gradient-emerald text-white" : "bg-muted"}`}>
-                {m.role === "ai" ? <Bot className="h-4 w-4" /> : <UserIcon className="h-4 w-4" />}
-              </div>
-              <div className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${m.role === "ai" ? "bg-card border" : "gradient-emerald text-white"}`}>
-                {m.text}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="border-t border-glass-border p-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder={t("Заң туралы сұрақ қойыңыз...", "Задайте вопрос о законе...", "Ask a question about the law...")}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && ask()}
-              className="h-11"
-            />
-            <Button onClick={ask} className="h-11 gradient-emerald gap-2">
-              <Send className="h-4 w-4" /> {t("Жіберу", "Отправить", "Send")}
-            </Button>
-
-          </div>
-        </div>
-      </div>
-
-      {/* Side */}
-      <div className="space-y-6 lg:col-span-2">
-        <div className="glass rounded-2xl p-5">
-          <h3 className="mb-3 font-semibold">{t("Маңызды заң баптары", "Важные статьи закона", "Key legal articles")}</h3>
-          <Accordion type="single" collapsible className="w-full">
-            {KNOWLEDGE.map((k, i) => (
-              <AccordionItem key={i} value={`item-${i}`} className="border-b-border/60">
-                <AccordionTrigger className="text-left text-sm">{k.q}</AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground">{k.a}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-
-        <ComplaintConstructor />
-      </div>
-    </div>
-  );
+interface LegalDoc {
+  id: string;
+  title: string;
+  doc_number: string | null;
+  category: string | null;
+  content: string;
+  added_by: string | null;
 }
 
-function ComplaintConstructor() {
-  const t = useT();
+interface Msg { role: "user" | "assistant"; content: string }
+
+export function AdiletAI() {
   const user = useAppStore((s) => s.user);
+  const isAdminMode = useAppStore((s) => s.isAdminMode);
+  const askAi = useServerFn(adiletChat);
 
-  const [school, setSchool] = useState("");
-  const [director, setDirector] = useState("");
-  const [teacher, setTeacher] = useState(user?.fullName ?? "");
-  const [violation, setViolation] = useState<string>("");
-  const [generated, setGenerated] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
+  const [docs, setDocs] = useState<LegalDoc[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Msg[]>([
+    {
+      role: "assistant",
+      content:
+        "Ассалаумағалейкум! Мен — **Әділет AI**, ҚР білім беру заңнамасы бойынша құқықтық кеңесшіңізбін. Сұрағыңызды қойыңыз — мен тек жүйеге жүктелген ресми заңдар мен бұйрықтарға сүйеніп жауап беремін.",
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const generate = () => {
-    if (!school || !director || !violation) {
-      toast.error(t("Барлық өрістерді толтырыңыз", "Заполните все поля", "Fill in all fields"));
+  // admin form
+  const [title, setTitle] = useState("");
+  const [docNumber, setDocNumber] = useState("");
+  const [category, setCategory] = useState("Бұйрық");
+  const [content, setContent] = useState("");
+
+  const loadDocs = async () => {
+    const { data, error } = await supabase
+      .from("legal_documents")
+      .select("*")
+      .order("created_at", { ascending: true });
+    if (error) {
+      toast.error("Заңдарды жүктеу мүмкін болмады");
       return;
     }
-
-    const date = new Date().toLocaleDateString("kk-KZ");
-    const text = `ҚАЗАҚСТАН РЕСПУБЛИКАСЫНЫҢ
-БІЛІМ БЕРУ САЛАСЫНДАҒЫ БАҚЫЛАУ КОМИТЕТІНЕ
-
-Арыз иесі: ${teacher}
-Мекеме: ${school}
-Басшы: ${director}
-
-АРЫЗ
-
-Мен, ${teacher}, ${school} мекемесінде педагог болып жұмыс істеймін.
-Соңғы кезеңде басшылықтан мынадай заңсыз әрекетке тап болдым:
-
-«${violation}»
-
-Бұл әрекет:
-• «Педагог мәртебесі туралы» ҚР Заңының 15-бабын,
-• ҚР БҒМ 514-бұйрығының талаптарын,
-• Еңбек кодексінің 23-бабын бұзады.
-
-Жоғарыда баяндалғанға сүйеніп, өтінемін:
-1. Аталған факт бойынша тексеру жүргізуді;
-2. Кінәлі тұлғаларды жауапқа тартуды;
-3. Маған жазбаша жауап жіберуді.
-
-Күні: ${date}
-Қолы: _______________ (${teacher})`;
-    setGenerated(text);
+    setDocs(data ?? []);
   };
 
-  const copy = () => {
-    navigator.clipboard.writeText(generated);
-    toast.success(t("Көшірілді", "Скопировано", "Copied"));
+  useEffect(() => { loadDocs(); }, []);
+
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const text = input.trim();
+    const next: Msg[] = [...messages, { role: "user", content: text }];
+    setMessages(next);
+    setInput("");
+    setLoading(true);
+    try {
+      const res = await askAi({ data: { messages: next.map((m) => ({ role: m.role, content: m.content })) } });
+      setMessages([...next, { role: "assistant", content: res.reply }]);
+    } catch (e) {
+      console.error(e);
+      toast.error("AI-мен байланыс үзілді");
+      setMessages([...next, { role: "assistant", content: "Кешіріңіз, техникалық қате болды." }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const print = () => {
-    if (!generated) return;
-    const w = window.open("", "_blank");
-    if (!w) return;
-    w.document.write(`<pre style="font-family:Georgia,serif;padding:40px;white-space:pre-wrap;line-height:1.6">${generated.replace(/</g, "&lt;")}</pre>`);
-    w.document.close();
-    w.print();
+  const addDoc = async () => {
+    if (!title.trim() || !content.trim()) {
+      toast.error("Атауы мен мәтінін толтырыңыз");
+      return;
+    }
+    if (!user) return;
+    const { error } = await supabase.from("legal_documents").insert({
+      title: title.trim(),
+      doc_number: docNumber.trim() || null,
+      category: category || null,
+      content: content.trim(),
+      added_by: user.id,
+    });
+    if (error) {
+      toast.error("Қосу мүмкін болмады: " + error.message);
+      return;
+    }
+    toast.success("Заң білім базасына қосылды");
+    setTitle(""); setDocNumber(""); setContent("");
+    loadDocs();
   };
+
+  const removeDoc = async (id: string, addedBy: string | null) => {
+    if (!addedBy) {
+      toast.error("Жүйелік заңды жою мүмкін емес");
+      return;
+    }
+    const { error } = await supabase.from("legal_documents").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Жойылды");
+    if (selectedId === id) setSelectedId(null);
+    loadDocs();
+  };
+
+  const selectedDoc = docs.find((d) => d.id === selectedId);
 
   return (
-    <div className="glass rounded-2xl p-5">
-      <h3 className="mb-1 font-semibold">{t("Ресми шағым конструкторы", "Конструктор официальной жалобы", "Official complaint builder")}</h3>
-      <p className="mb-4 text-xs text-muted-foreground">{t("Заңды формада хат құрастырыңыз", "Составьте письмо в законной форме", "Compose a letter in legal form")}</p>
-      <div className="space-y-3">
-        <div>
-          <Label className="text-xs">{t("Мектеп атауы", "Название школы", "School name")}</Label>
-          <Input value={school} onChange={(e) => setSchool(e.target.value)} placeholder={t("№1 жалпы білім беретін мектеп", "Школа №1", "School No. 1")} />
+    <div className="adilet-theme -m-4 sm:-m-6 lg:-m-8 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#f1f5fb] via-white to-[#e8eef7] p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="mb-6 flex items-center gap-4 rounded-2xl border border-[#dbe4f0] bg-white p-5 shadow-sm">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#1d4ed8] to-[#0c2a6b] shadow-md">
+          <Scale className="h-6 w-6 text-white" />
         </div>
-        <div>
-          <Label className="text-xs">{t("Директор", "Директор", "Director")}</Label>
-          <Input value={director} onChange={(e) => setDirector(e.target.value)} placeholder={t("А.Ә.Т.", "Ф.И.О.", "Full name")} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-[#0c2a6b] sm:text-2xl">Әділет AI</h1>
+            <Badge className="bg-[#1d4ed8] hover:bg-[#1d4ed8]">Ресми</Badge>
+          </div>
+          <p className="text-sm text-slate-600">
+            Қазақстан Республикасының білім беру заңнамасы бойынша құқықтық ИИ-кеңесші
+          </p>
         </div>
-        <div>
-          <Label className="text-xs">{t("Педагог", "Педагог", "Teacher")}</Label>
-          <Input value={teacher} onChange={(e) => setTeacher(e.target.value)} />
+        <div className="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 sm:flex">
+          <Sparkles className="h-3.5 w-3.5" /> Онлайн
         </div>
-        <div>
-          <Label className="text-xs">{t("Бұзушылық түрі", "Тип нарушения", "Violation type")}</Label>
-          <Select value={violation} onValueChange={setViolation}>
-            <SelectTrigger><SelectValue placeholder={t("Таңдаңыз", "Выберите", "Select")} /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Сенбі күні мәжбүрлі тазалау жұмыстарына тарту">{t("Сенбі күні мәжбүрлі тазалау", "Принуждение к субботнику", "Forced Saturday work")}</SelectItem>
-              <SelectItem value="Артық қағазбастылық пен есеп беруді талап ету">{t("Артық қағазбастылық", "Излишняя бюрократия", "Excess paperwork")}</SelectItem>
-              <SelectItem value="Газет-журналдарға мәжбүрлі жазылу">{t("Мәжбүрлі жазылу", "Принудительная подписка", "Forced subscription")}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button onClick={generate} className="w-full gradient-emerald">{t("Хат құрастыру", "Сформировать письмо", "Generate letter")}</Button>
+      </div>
 
-
-
-        {generated && (
-          <>
-            <div ref={ref} className="max-h-64 overflow-y-auto rounded-xl border bg-card/60 p-4 font-serif text-xs leading-relaxed whitespace-pre-wrap">
-              {generated}
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+        {/* Sidebar: Knowledge Base */}
+        <aside className="space-y-4">
+          <div className="rounded-2xl border border-[#dbe4f0] bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#e5ecf5] p-4">
+              <div>
+                <div className="text-sm font-semibold text-[#0c2a6b]">Білім базасы</div>
+                <div className="text-xs text-slate-500">{docs.length} құжат</div>
+              </div>
+              <FileText className="h-4 w-4 text-[#1d4ed8]" />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={copy} className="gap-2"><Copy className="h-4 w-4" /> Көшіру</Button>
-              <Button variant="outline" onClick={print} className="gap-2"><Printer className="h-4 w-4" /> PDF басу</Button>
-            </div>
-          </>
-        )}
+            <ScrollArea className="h-[360px]">
+              <div className="space-y-1 p-2">
+                {docs.map((d) => {
+                  const isSystem = !d.added_by;
+                  const active = selectedId === d.id;
+                  return (
+                    <div
+                      key={d.id}
+                      className={`group flex items-start gap-2 rounded-lg p-2.5 text-left text-sm transition-colors ${
+                        active ? "bg-[#e8eef7] text-[#0c2a6b]" : "hover:bg-slate-50"
+                      }`}
+                    >
+                      <button onClick={() => setSelectedId(active ? null : d.id)} className="flex-1 text-left">
+                        <div className="flex items-center gap-1.5">
+                          {d.doc_number && (
+                            <span className="rounded bg-[#0c2a6b]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#0c2a6b]">
+                              {d.doc_number}
+                            </span>
+                          )}
+                          {isSystem && <ShieldCheck className="h-3 w-3 text-emerald-600" />}
+                        </div>
+                        <div className="mt-1 line-clamp-2 text-xs font-medium leading-snug text-slate-700">
+                          {d.title}
+                        </div>
+                      </button>
+                      {isAdminMode && !isSystem && (
+                        <button
+                          onClick={() => removeDoc(d.id, d.added_by)}
+                          className="opacity-0 transition-opacity group-hover:opacity-100"
+                          aria-label="Жою"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+                {docs.length === 0 && (
+                  <div className="p-4 text-center text-xs text-slate-400">Әзірге құжат жоқ</div>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
+
+          {isAdminMode && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-[#dbe4f0] bg-white p-4 shadow-sm"
+            >
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#0c2a6b]">
+                <Plus className="h-4 w-4" /> Жаңа заң қосу
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs">Атауы *</Label>
+                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="«Білім туралы» Заң" />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label className="text-xs">Нөмірі</Label>
+                    <Input value={docNumber} onChange={(e) => setDocNumber(e.target.value)} placeholder="№ 472" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Санаты</Label>
+                    <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Бұйрық" />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs">Мәтіні *</Label>
+                  <Textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    rows={6}
+                    placeholder="Заңның толық мәтінін немесе негізгі тармақтарын енгізіңіз..."
+                    className="resize-none text-xs"
+                  />
+                </div>
+                <Button onClick={addDoc} className="w-full bg-[#1d4ed8] hover:bg-[#1e40af]">
+                  <Plus className="mr-1 h-4 w-4" /> Базаға қосу
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </aside>
+
+        {/* Main: Chat or Doc Viewer */}
+        <section className="flex h-[720px] flex-col rounded-2xl border border-[#dbe4f0] bg-white shadow-sm">
+          {selectedDoc ? (
+            <>
+              <div className="flex items-center justify-between border-b border-[#e5ecf5] p-5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    {selectedDoc.doc_number && (
+                      <Badge variant="outline" className="border-[#0c2a6b]/30 text-[#0c2a6b]">
+                        {selectedDoc.doc_number}
+                      </Badge>
+                    )}
+                    {selectedDoc.category && (
+                      <span className="text-xs text-slate-500">{selectedDoc.category}</span>
+                    )}
+                  </div>
+                  <h2 className="mt-1 font-semibold text-[#0c2a6b]">{selectedDoc.title}</h2>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedId(null)}>
+                  Жабу
+                </Button>
+              </div>
+              <ScrollArea className="flex-1 p-6">
+                <div className="prose prose-sm max-w-none whitespace-pre-wrap text-slate-700">
+                  {selectedDoc.content}
+                </div>
+              </ScrollArea>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-3 border-b border-[#e5ecf5] p-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0c2a6b]">
+                  <Bot className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <div className="font-semibold text-[#0c2a6b]">Құқықтық кеңесші</div>
+                  <div className="text-xs text-slate-500">Тек білім базасындағы құжаттарға сүйенеді</div>
+                </div>
+              </div>
+
+              <ScrollArea className="flex-1 p-6">
+                <div className="space-y-5">
+                  {messages.map((m, i) => (
+                    <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
+                      <div
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                          m.role === "assistant" ? "bg-[#0c2a6b] text-white" : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {m.role === "assistant" ? <Bot className="h-4 w-4" /> : <UserIcon className="h-4 w-4" />}
+                      </div>
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
+                          m.role === "assistant"
+                            ? "border border-[#e5ecf5] bg-[#f8fafd] text-slate-800"
+                            : "bg-[#1d4ed8] text-white"
+                        }`}
+                      >
+                        {m.role === "assistant" ? (
+                          <div className="prose prose-sm max-w-none prose-headings:text-[#0c2a6b] prose-strong:text-[#0c2a6b]">
+                            <ReactMarkdown>{m.content}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div className="whitespace-pre-wrap">{m.content}</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {loading && (
+                    <div className="flex gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0c2a6b] text-white">
+                        <Bot className="h-4 w-4" />
+                      </div>
+                      <div className="flex items-center gap-2 rounded-2xl border border-[#e5ecf5] bg-[#f8fafd] px-4 py-3 text-sm text-slate-500">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Заңдарды зерделеп жатыр...
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+
+              <div className="border-t border-[#e5ecf5] p-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Заңдық сұрағыңызды қазақ тілінде жазыңыз..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
+                    disabled={loading}
+                    className="h-11 border-[#dbe4f0] focus-visible:ring-[#1d4ed8]"
+                  />
+                  <Button
+                    onClick={send}
+                    disabled={loading || !input.trim()}
+                    className="h-11 gap-2 bg-[#1d4ed8] hover:bg-[#1e40af]"
+                  >
+                    <Send className="h-4 w-4" /> Жіберу
+                  </Button>
+                </div>
+                <p className="mt-2 text-[11px] text-slate-400">
+                  💡 Әділет AI тек жоғарыдағы білім базасына жүктелген заңдар мен бұйрықтарға сүйеніп жауап береді.
+                </p>
+              </div>
+            </>
+          )}
+        </section>
       </div>
     </div>
   );
