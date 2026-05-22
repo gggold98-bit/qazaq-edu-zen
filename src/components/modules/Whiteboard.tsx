@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Eraser, Undo2, Redo2, Trash2, Play, Pause, RotateCcw, Volume2, VolumeX,
   Pencil, Settings, Mic, MicOff, Sparkles, Users, Shuffle, AlertTriangle, Timer as TimerIcon,
+  Maximize2, Minimize2, X, PanelRightOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
