@@ -65,14 +65,22 @@ export function Methodology() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">{t("Әдістемелік кабинет", "Методический кабинет", "Methodology cabinet")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("Сабаққа дайын материалдар жинағы", "Готовые материалы для уроков", "Ready-to-use lesson materials")}</p>
         </div>
-        <div className="glass flex items-center gap-2 rounded-full px-4 py-2 text-sm">
-          <Coins className="h-4 w-4 text-primary" />
-          <span className="font-semibold">{points} {t("ұпай", "баллов", "points")}</span>
+        <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 px-6 py-3 shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15">
+            <Coins className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t("Қолданыстағы ұпай", "Доступно баллов", "Available points")}</p>
+            <p className="text-xl font-bold text-primary">{points} {t("ұпай", "баллов", "points")}</p>
+          </div>
+          <div className="ml-2 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600">
+            {t("Қорғалған", "Защищено", "Protected")}
+          </div>
         </div>
       </div>
 
@@ -95,7 +103,6 @@ export function Methodology() {
             <span className="font-medium">{t("Ақмола облысының әдістемелік кабинеті", "Методический кабинет Акмолинской области", "Akmola region methodology cabinet")}</span>
           </div>
           {renderPlaceholder()}
-
         </div>
       )}
 
