@@ -41,12 +41,6 @@ export function AdiletAI() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // admin form
-  const [title, setTitle] = useState("");
-  const [docNumber, setDocNumber] = useState("");
-  const [category, setCategory] = useState("Бұйрық");
-  const [content, setContent] = useState("");
-
   const loadDocs = async () => {
     const { data, error } = await supabase
       .from("legal_documents")
