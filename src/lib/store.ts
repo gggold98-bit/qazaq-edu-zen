@@ -201,7 +201,7 @@ async function hydrateProfile(userId: string, email: string, fallbackName: strin
     role: "teacher",
   });
   if (profile) {
-    s.setPoints(profile.points ?? 450);
+    s.setPoints(profile.points ?? 0);
     s.setCertificates(profile.certificates ?? 3);
     s.setUnlockedItems(profile.unlocked_items ?? []);
   }
