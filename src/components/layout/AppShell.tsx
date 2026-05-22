@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Dashboard } from "@/components/modules/Dashboard";
+import { Dashboard, AstanaClock } from "@/components/modules/Dashboard";
 import { AdiletAI } from "@/components/modules/AdiletAI";
 import { Methodology } from "@/components/modules/Methodology";
 import { Whiteboard } from "@/components/modules/Whiteboard";
