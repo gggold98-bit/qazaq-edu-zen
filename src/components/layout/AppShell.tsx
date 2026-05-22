@@ -12,7 +12,6 @@ import {
   Coins,
   Moon,
   Sun,
-  ShieldCheck,
   Menu,
   X,
   FileText,
@@ -38,7 +37,6 @@ import { Whiteboard } from "@/components/modules/Whiteboard";
 import { LibraryModule } from "@/components/modules/LibraryModule";
 import { ComingSoon } from "@/components/modules/ComingSoon";
 import { Subscriptions } from "@/components/modules/Subscriptions";
-import { AdminUploader } from "@/components/modules/AdminUploader";
 
 function initials(name: string) {
   return name

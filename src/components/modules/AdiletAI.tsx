@@ -27,7 +27,6 @@ interface Msg { role: "user" | "assistant"; content: string }
 
 export function AdiletAI() {
   const user = useAppStore((s) => s.user);
-  const isAdminMode = useAppStore((s) => s.isAdminMode);
   const askAi = useServerFn(adiletChat);
 
   const [docs, setDocs] = useState<LegalDoc[]>([]);

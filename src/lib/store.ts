@@ -135,9 +135,6 @@ export const useAppStore = create<AppState>()(
         if (uid) await supabase.from("profiles").update({ unlocked_items: next }).eq("id", uid);
       },
 
-      isAdminMode: false,
-      toggleAdminMode: () => set({ isAdminMode: !get().isAdminMode }),
-
       lang: "kk",
       setLang: (l) => set({ lang: l }),
 
