@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Newspaper } from "lucide-react";
+import { Newspaper } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { useT } from "@/lib/i18n";
+import { SchoolCalendar } from "@/components/modules/SchoolCalendar";
 
 export function Dashboard() {
   const { user } = useAppStore();
