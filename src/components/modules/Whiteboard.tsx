@@ -690,6 +690,9 @@ function StudentPicker() {
   const [winner, setWinner] = useState<string | null>(null);
   const [showWinner, setShowWinner] = useState(false);
   const [confetti, setConfetti] = useState(false);
+  const [groupCount, setGroupCount] = useState<2 | 3 | 4 | 5>(2);
+  const [groups, setGroups] = useState<string[][] | null>(null);
+  const [showGroups, setShowGroups] = useState(false);
   const tickIntervalRef = useRef<number | null>(null);
 
   const names = useMemo(
