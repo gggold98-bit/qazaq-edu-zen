@@ -62,6 +62,10 @@ interface AppState {
   // language
   lang: "kk" | "ru" | "en";
   setLang: (l: "kk" | "ru" | "en") => void;
+
+  // subscription
+  hasSubscription: boolean;
+  setHasSubscription: (v: boolean) => void;
 }
 
 
