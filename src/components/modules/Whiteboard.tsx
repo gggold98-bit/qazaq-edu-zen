@@ -666,7 +666,7 @@ function LessonTimer() {
         <div className="text-3xl font-semibold tabular-nums">{m}:{s}</div>
       </div>
       <div className="mt-4 flex justify-center gap-1.5">
-        {[180, 300, 600].map((sec) => (
+        {[60, 300, 1200, 2700, 3600].map((sec) => (
           <Button key={sec} size="sm" variant="outline" onClick={() => set(sec)}>{sec / 60} мин</Button>
         ))}
       </div>
