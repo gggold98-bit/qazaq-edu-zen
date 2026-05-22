@@ -195,11 +195,10 @@ export function AppShell() {
             >
               {activeKey === "dashboard" && <Dashboard />}
               {activeKey === "adilet" && <AdiletAI />}
-              {activeKey === "ai-kmj" && <ComingSoon title={t("AI ҚМЖ", "AI КСП", "AI Short Plans")} />}
-              {activeKey === "ai-bzhb" && <ComingSoon title={t("AI БЖБ-ТЖБ", "AI СОР-СОЧ", "AI Assessments")} />}
+              {activeKey === "ai-kmj-bzhb" && <ComingSoon title={t("AI ҚМЖ және БЖБ-ТЖБ", "AI КСП и СОР-СОЧ", "AI Plans & Assessments")} />}
               {activeKey === "ai-olympiad" && <ComingSoon title={t("AI Олимпиадаға дайындық", "AI Подготовка к олимпиаде", "AI Olympiad prep")} />}
-              {activeKey === "courses" && <ComingSoon title={t("Курстар", "Курсы", "Courses")} />}
-              {activeKey === "podcasts" && <ComingSoon title={t("Подкасттар", "Подкасты", "Podcasts")} />}
+              {activeKey === "courses-podcasts" && <ComingSoon title={t("Курстар және Подкасттар", "Курсы и Подкасты", "Courses & Podcasts")} />}
+              {activeKey === "qaz-quiz" && <ComingSoon title={t("Qaz Quiz", "Qaz Quiz", "Qaz Quiz")} />}
               {activeKey === "methodology" && <Methodology />}
               {activeKey === "whiteboard" && <Whiteboard />}
               {activeKey === "library" && <LibraryModule />}
