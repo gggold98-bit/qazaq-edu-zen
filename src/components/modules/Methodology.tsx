@@ -111,8 +111,7 @@ export function Methodology() {
               const unlocked = unlockedItems.includes(it.id) || it.cost === 0;
               return (
                 <div key={it.id} className="glass group relative overflow-hidden rounded-2xl p-5 transition-transform hover:-translate-y-1">
-                  <div className="mb-4 flex items-start justify-between">
-                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{it.typeLabel}</span>
+                  <div className="mb-4 flex items-start justify-end">
                     {!unlocked && <Lock className="h-4 w-4 text-muted-foreground" />}
                   </div>
                   <h3 className="line-clamp-2 text-base font-semibold">{it.title}</h3>
