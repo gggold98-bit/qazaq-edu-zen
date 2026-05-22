@@ -690,6 +690,9 @@ function StudentPicker() {
   const [winner, setWinner] = useState<string | null>(null);
   const [showWinner, setShowWinner] = useState(false);
   const [confetti, setConfetti] = useState(false);
+  const [groupCount, setGroupCount] = useState<2 | 3 | 4 | 5>(2);
+  const [groups, setGroups] = useState<string[][] | null>(null);
+  const [showGroups, setShowGroups] = useState(false);
   const tickIntervalRef = useRef<number | null>(null);
 
   const names = useMemo(
@@ -736,8 +739,25 @@ function StudentPicker() {
 
   useEffect(() => () => { if (tickIntervalRef.current) clearTimeout(tickIntervalRef.current); }, []);
 
-  const reset = () => { setRaw(""); setWinner(null); toast.success("Тізім тазартылды"); };
+  const reset = () => { setRaw(""); setWinner(null); setGroups(null); toast.success("Тізім тазартылды"); };
   const loadDemo = () => { setRaw(DEFAULT_NAMES.join("\n")); toast.success("Демо тізім жүктелді"); };
+
+  const splitGroups = () => {
+    if (names.length < groupCount) {
+      toast.error(`Кем дегенде ${groupCount} оқушы керек`);
+      return;
+    }
+    audio.click();
+    const shuffled = [...names].sort(() => Math.random() - 0.5);
+    const result: string[][] = Array.from({ length: groupCount }, () => []);
+    shuffled.forEach((n, i) => result[i % groupCount].push(n));
+    setGroups(result);
+    setShowGroups(true);
+    setConfetti(true);
+    audio.fanfare();
+    window.setTimeout(() => setConfetti(false), 2000);
+  };
+  const groupPalette = ["from-indigo-500 to-violet-500", "from-emerald-500 to-teal-500", "from-amber-500 to-orange-500", "from-pink-500 to-rose-500", "from-sky-500 to-cyan-500"];
 
   const size = 320;
   const r = size / 2;
@@ -774,6 +794,39 @@ function StudentPicker() {
             <Button variant="outline" size="sm" onClick={reset} className="rounded-full"><Trash2 className="mr-1 h-4 w-4" /> Тазалау</Button>
             <Button variant="ghost" size="sm" onClick={loadDemo} className="rounded-full">Демо тізім</Button>
             <span className="ml-auto text-xs text-muted-foreground">Барлығы: <b className="text-foreground">{names.length}</b></span>
+          </div>
+
+          {/* Group division */}
+          <div className="mt-4 rounded-xl border border-border/60 bg-muted/30 p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <Users className="h-4 w-4 text-emerald-500" />
+              <span className="text-sm font-semibold">Топқа бөлу</span>
+              <span className="ml-auto text-xs text-muted-foreground">Топ саны:</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {[2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setGroupCount(n as 2 | 3 | 4 | 5)}
+                  className={`h-9 w-9 rounded-full text-sm font-bold transition ${
+                    groupCount === n
+                      ? "bg-gradient-to-br from-indigo-500 to-emerald-500 text-white shadow-md"
+                      : "bg-background text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={splitGroups}
+                disabled={names.length < groupCount}
+                className="ml-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 disabled:opacity-50"
+              >
+                <Users className="h-4 w-4" /> Топтарға бөлу
+              </motion.button>
+            </div>
           </div>
         </div>
 
@@ -862,6 +915,41 @@ function StudentPicker() {
           </motion.div>
           <DialogFooter className="sm:justify-center">
             <Button onClick={() => setShowWinner(false)} className="gradient-emerald">Тақтаға оралу</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Groups popup */}
+      <Dialog open={showGroups} onOpenChange={setShowGroups}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">👥 Топтарға бөлу нәтижесі</DialogTitle>
+            <DialogDescription>Оқушылар {groupCount} топқа кездейсоқ бөлінді</DialogDescription>
+          </DialogHeader>
+          <div className={`grid gap-3 ${groupCount === 2 ? "sm:grid-cols-2" : groupCount === 3 ? "sm:grid-cols-3" : groupCount === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-2 lg:grid-cols-5"}`}>
+            {groups?.map((g, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: i * 0.08 }}
+                className={`rounded-2xl bg-gradient-to-br ${groupPalette[i]} p-4 text-white shadow-lg`}
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <h4 className="text-lg font-bold">{i + 1}-топ</h4>
+                  <span className="rounded-full bg-white/25 px-2 py-0.5 text-xs font-semibold">{g.length}</span>
+                </div>
+                <ul className="space-y-1 text-sm">
+                  {g.map((n) => (
+                    <li key={n} className="rounded-md bg-white/15 px-2 py-1 font-medium">{n}</li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button variant="outline" onClick={splitGroups} className="rounded-full"><Shuffle className="mr-1 h-4 w-4" /> Қайта бөлу</Button>
+            <Button onClick={() => setShowGroups(false)} className="gradient-emerald">Жабу</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
