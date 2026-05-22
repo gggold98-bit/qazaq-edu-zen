@@ -55,11 +55,8 @@ interface AppState {
   setUnlockedItems: (ids: string[]) => void;
   unlockItem: (id: string) => Promise<void>;
 
-  // admin mode
-  isAdminMode: boolean;
-  toggleAdminMode: () => void;
-
   // language
+
   lang: "kk" | "ru" | "en";
   setLang: (l: "kk" | "ru" | "en") => void;
 
