@@ -795,6 +795,39 @@ function StudentPicker() {
             <Button variant="ghost" size="sm" onClick={loadDemo} className="rounded-full">Демо тізім</Button>
             <span className="ml-auto text-xs text-muted-foreground">Барлығы: <b className="text-foreground">{names.length}</b></span>
           </div>
+
+          {/* Group division */}
+          <div className="mt-4 rounded-xl border border-border/60 bg-muted/30 p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <Users className="h-4 w-4 text-emerald-500" />
+              <span className="text-sm font-semibold">Топқа бөлу</span>
+              <span className="ml-auto text-xs text-muted-foreground">Топ саны:</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {[2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setGroupCount(n as 2 | 3 | 4 | 5)}
+                  className={`h-9 w-9 rounded-full text-sm font-bold transition ${
+                    groupCount === n
+                      ? "bg-gradient-to-br from-indigo-500 to-emerald-500 text-white shadow-md"
+                      : "bg-background text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={splitGroups}
+                disabled={names.length < groupCount}
+                className="ml-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 disabled:opacity-50"
+              >
+                <Users className="h-4 w-4" /> Топтарға бөлу
+              </motion.button>
+            </div>
+          </div>
         </div>
 
         <div className="relative mx-auto" style={{ width: size, height: size + 24 }}>
