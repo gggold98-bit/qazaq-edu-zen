@@ -144,6 +144,9 @@ export const useAppStore = create<AppState>()(
 
       lang: "kk",
       setLang: (l) => set({ lang: l }),
+
+      hasSubscription: false,
+      setHasSubscription: (v) => set({ hasSubscription: v }),
     }),
     {
       name: "qazaq-teachers-ai",
