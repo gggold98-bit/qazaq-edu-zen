@@ -56,10 +56,14 @@ export function AppShell() {
   const NAV: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { key: "dashboard",     label: t("Басты бет",                "Главная",                  "Home"),                 icon: LayoutDashboard },
     { key: "adilet",        label: t("Adilet AI",                "Adilet AI",                "Adilet AI"),            icon: Scale },
+    { key: "ai-kmj",        label: t("AI ҚМЖ",                   "AI КСП",                   "AI Short Plans"),       icon: FileText },
+    { key: "ai-bzhb",       label: t("AI БЖБ-ТЖБ",               "AI СОР-СОЧ",               "AI Assessments"),       icon: ClipboardList },
+    { key: "ai-olympiad",   label: t("AI Олимпиадаға дайындық",  "AI Подготовка к олимпиаде","AI Olympiad prep"),     icon: Trophy },
+    { key: "courses",       label: t("Курстар",                  "Курсы",                    "Courses"),              icon: GraduationCap },
+    { key: "podcasts",      label: t("Подкасттар",               "Подкасты",                 "Podcasts"),             icon: Mic },
     { key: "methodology",   label: t("Әдістемелік кабинет",      "Методический кабинет",     "Methodology cabinet"),  icon: BookOpen },
     { key: "whiteboard",    label: t("AI Интерактивті тақта",    "AI Интерактивная доска",   "AI Interactive board"), icon: PenTool },
     { key: "library",       label: t("AI Кітапхана",             "AI Библиотека",            "AI Library"),           icon: Library },
-    { key: "academy",       label: t("Академия",                 "Академия",                 "Academy"),              icon: GraduationCap },
     { key: "subscriptions", label: t("Жазылымдар",               "Подписки",                 "Subscriptions"),        icon: CreditCard },
   ];
 
