@@ -919,6 +919,41 @@ function StudentPicker() {
         </DialogContent>
       </Dialog>
 
+      {/* Groups popup */}
+      <Dialog open={showGroups} onOpenChange={setShowGroups}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">👥 Топтарға бөлу нәтижесі</DialogTitle>
+            <DialogDescription>Оқушылар {groupCount} топқа кездейсоқ бөлінді</DialogDescription>
+          </DialogHeader>
+          <div className={`grid gap-3 ${groupCount <= 2 ? "sm:grid-cols-2" : groupCount === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-" + groupCount}`}>
+            {groups?.map((g, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: i * 0.08 }}
+                className={`rounded-2xl bg-gradient-to-br ${groupPalette[i]} p-4 text-white shadow-lg`}
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <h4 className="text-lg font-bold">{i + 1}-топ</h4>
+                  <span className="rounded-full bg-white/25 px-2 py-0.5 text-xs font-semibold">{g.length}</span>
+                </div>
+                <ul className="space-y-1 text-sm">
+                  {g.map((n) => (
+                    <li key={n} className="rounded-md bg-white/15 px-2 py-1 font-medium">{n}</li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button variant="outline" onClick={splitGroups} className="rounded-full"><Shuffle className="mr-1 h-4 w-4" /> Қайта бөлу</Button>
+            <Button onClick={() => setShowGroups(false)} className="gradient-emerald">Жабу</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Confetti */}
       <AnimatePresence>
         {confetti && (
