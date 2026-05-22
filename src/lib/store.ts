@@ -5,10 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 export type TabKey =
   | "dashboard"
   | "adilet"
+  | "ai-kmj"
+  | "ai-bzhb"
+  | "ai-olympiad"
+  | "courses"
+  | "podcasts"
   | "methodology"
   | "whiteboard"
   | "library"
-  | "academy"
   | "subscriptions"
   | "admin";
 
