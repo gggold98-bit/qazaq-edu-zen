@@ -739,8 +739,25 @@ function StudentPicker() {
 
   useEffect(() => () => { if (tickIntervalRef.current) clearTimeout(tickIntervalRef.current); }, []);
 
-  const reset = () => { setRaw(""); setWinner(null); toast.success("Тізім тазартылды"); };
+  const reset = () => { setRaw(""); setWinner(null); setGroups(null); toast.success("Тізім тазартылды"); };
   const loadDemo = () => { setRaw(DEFAULT_NAMES.join("\n")); toast.success("Демо тізім жүктелді"); };
+
+  const splitGroups = () => {
+    if (names.length < groupCount) {
+      toast.error(`Кем дегенде ${groupCount} оқушы керек`);
+      return;
+    }
+    audio.click();
+    const shuffled = [...names].sort(() => Math.random() - 0.5);
+    const result: string[][] = Array.from({ length: groupCount }, () => []);
+    shuffled.forEach((n, i) => result[i % groupCount].push(n));
+    setGroups(result);
+    setShowGroups(true);
+    setConfetti(true);
+    audio.fanfare();
+    window.setTimeout(() => setConfetti(false), 2000);
+  };
+  const groupPalette = ["from-indigo-500 to-violet-500", "from-emerald-500 to-teal-500", "from-amber-500 to-orange-500", "from-pink-500 to-rose-500", "from-sky-500 to-cyan-500"];
 
   const size = 320;
   const r = size / 2;
