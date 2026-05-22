@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Newspaper } from "lucide-react";
+import { Newspaper } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { useT } from "@/lib/i18n";
+import { SchoolCalendar } from "@/components/modules/SchoolCalendar";
 
 export function Dashboard() {
   const { user } = useAppStore();
@@ -91,26 +92,8 @@ export function Dashboard() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="glass rounded-2xl p-6"
         >
-          <div className="mb-4 flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">{t("Күнтізбе", "Календарь", "Calendar")}</h3>
-          </div>
-          <div className="space-y-3">
-            {events.map((e) => (
-              <div key={e.title} className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/40 p-4">
-                <div className="gradient-emerald flex h-14 w-14 flex-col items-center justify-center rounded-xl text-white">
-                  <div className="text-[10px] uppercase tracking-wide opacity-80">{monthShort(e.date)}</div>
-                  <div className="text-lg font-bold leading-none">{dayShort(e.date)}</div>
-                </div>
-                <div className="flex-1">
-                  <div className="font-medium">{e.title}</div>
-                  <div className="text-xs text-muted-foreground">{e.tag} · {t("онлайн", "онлайн", "online")}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <SchoolCalendar />
         </motion.div>
       </div>
     </div>

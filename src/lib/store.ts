@@ -62,6 +62,10 @@ interface AppState {
   // language
   lang: "kk" | "ru" | "en";
   setLang: (l: "kk" | "ru" | "en") => void;
+
+  // subscription
+  hasSubscription: boolean;
+  setHasSubscription: (v: boolean) => void;
 }
 
 
@@ -78,7 +82,7 @@ export const useAppStore = create<AppState>()(
           user: null,
           activeTab: "dashboard",
           isAdminMode: false,
-          points: 450,
+          points: 0,
           certificates: 3,
           unlockedItems: [],
         });
@@ -96,9 +100,10 @@ export const useAppStore = create<AppState>()(
       activeTab: "dashboard",
       setActiveTab: (t) => set({ activeTab: t }),
 
-      points: 450,
+      points: 0,
       setPoints: (n) => set({ points: n }),
       addPoints: async (n) => {
+        if (!get().hasSubscription) return;
         const next = get().points + n;
         set({ points: next });
         const uid = get().user?.id;
@@ -139,6 +144,9 @@ export const useAppStore = create<AppState>()(
 
       lang: "kk",
       setLang: (l) => set({ lang: l }),
+
+      hasSubscription: false,
+      setHasSubscription: (v) => set({ hasSubscription: v }),
     }),
     {
       name: "qazaq-teachers-ai",
@@ -193,7 +201,7 @@ async function hydrateProfile(userId: string, email: string, fallbackName: strin
     role: "teacher",
   });
   if (profile) {
-    s.setPoints(profile.points ?? 450);
+    s.setPoints(profile.points ?? 0);
     s.setCertificates(profile.certificates ?? 3);
     s.setUnlockedItems(profile.unlocked_items ?? []);
   }
