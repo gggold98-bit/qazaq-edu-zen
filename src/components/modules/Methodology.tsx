@@ -1,59 +1,19 @@
 import { useState } from "react";
-import { FileText, Presentation, ClipboardList, Lock, Download, Coins, MapPin, FolderOpen, UserCircle, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MapPin, FolderOpen, UserCircle, Clock } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAppStore } from "@/lib/store";
 import { useT } from "@/lib/i18n";
-import { toast } from "sonner";
 
 type SectionKey = "aqmola" | "documents" | "pedagog";
 
 export function Methodology() {
   const t = useT();
   const [section, setSection] = useState<SectionKey>("aqmola");
-  const { unlockedItems, unlockItem, spendPoints, points } = useAppStore();
 
   const SECTIONS: { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { key: "aqmola",    label: t("Ақмола облысы", "Акмолинская область", "Akmola region"),     icon: MapPin },
     { key: "documents", label: t("Дайын құжаттар", "Готовые документы", "Ready documents"),   icon: FolderOpen },
     { key: "pedagog",   label: t("Педагог құжаттары", "Педагогические документы", "Pedagogical documents"), icon: UserCircle },
   ];
-
-  const ITEMS = [
-    { id: "qmj-1", type: "ҚМЖ",            typeLabel: t("ҚМЖ", "КСП", "Short plan"),            title: t("Математика 5-сынып ҚМЖ жинағы", "Сборник КСП по математике, 5 класс", "Math grade 5 short-plan set"), size: "2.4 MB", cost: 0 },
-    { id: "qmj-2", type: "ҚМЖ",            typeLabel: t("ҚМЖ", "КСП", "Short plan"),            title: t("Қазақ тілі 7-сынып, II тоқсан", "Казахский язык 7 класс, II четверть", "Kazakh language grade 7, term II"), size: "1.8 MB", cost: 50 },
-    { id: "qmj-3", type: "ҚМЖ",            typeLabel: t("ҚМЖ", "КСП", "Short plan"),            title: t("Биология 9-сынып толық ҚМЖ", "Биология 9 класс — полный КСП", "Biology grade 9 full short-plan"),     size: "3.1 MB", cost: 120 },
-    { id: "test-1", type: "Тесттер",       typeLabel: t("Тесттер", "Тесты", "Tests"),           title: t("ҰБТ дайындық тесттері (Тарих)", "Тесты подготовки к ЕНТ (История)", "UNT prep tests (History)"),         size: "900 KB", cost: 80 },
-    { id: "test-2", type: "Тесттер",       typeLabel: t("Тесттер", "Тесты", "Tests"),           title: t("Физика 10-сынып БЖБ/ТЖБ", "Физика 10 класс СОР/СОЧ", "Physics grade 10 quizzes/exams"),             size: "1.2 MB", cost: 60 },
-    { id: "test-3", type: "Тесттер",       typeLabel: t("Тесттер", "Тесты", "Tests"),           title: t("Ағылшын тілі, А2 деңгейі", "Английский язык, уровень A2", "English, A2 level"),                       size: "750 KB", cost: 0 },
-    { id: "pres-1", type: "Презентациялар", typeLabel: t("Презентациялар", "Презентации", "Slides"), title: t("Заманауи педагогика негіздері", "Основы современной педагогики", "Foundations of modern pedagogy"), size: "5.6 MB", cost: 100 },
-    { id: "pres-2", type: "Презентациялар", typeLabel: t("Презентациялар", "Презентации", "Slides"), title: t("STEM сабақтары — практикум", "Уроки STEM — практикум", "STEM lessons — workshop"),                size: "8.2 MB", cost: 150 },
-    { id: "pres-3", type: "Презентациялар", typeLabel: t("Презентациялар", "Презентации", "Slides"), title: t("Цифрлық құралдар шолуы", "Обзор цифровых инструментов", "Digital tools overview"),                size: "4.4 MB", cost: 0 },
-  ];
-
-  const DOCS_TABS = [
-    { value: "all",            label: t("Барлығы",        "Все",          "All"),    icon: FileText },
-    { value: "ҚМЖ",            label: t("ҚМЖ",            "КСП",          "Short plans"), icon: FileText },
-    { value: "Тесттер",        label: t("Тесттер",        "Тесты",        "Tests"),  icon: ClipboardList },
-    { value: "Презентациялар", label: t("Презентациялар", "Презентации",  "Slides"), icon: Presentation },
-  ];
-
-  const [docTab, setDocTab] = useState("all");
-  const filtered = docTab === "all" ? ITEMS : ITEMS.filter((i) => i.type === docTab);
-
-  const handleUnlock = async (it: (typeof ITEMS)[number]) => {
-    if (unlockedItems.includes(it.id) || it.cost === 0) {
-      toast.success(t(`«${it.title}» жүктелуде...`, `«${it.title}» загружается...`, `"${it.title}" downloading...`));
-      return;
-    }
-    const ok = await spendPoints(it.cost);
-    if (!ok) {
-      toast.error(t("Ұпай жеткіліксіз", "Недостаточно баллов", "Not enough points"));
-      return;
-    }
-    await unlockItem(it.id);
-    toast.success(t(`Ашылды! −${it.cost} ұпай`, `Открыто! −${it.cost} баллов`, `Unlocked! −${it.cost} points`));
-  };
 
   const renderPlaceholder = () => (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 py-20 text-center">
