@@ -100,9 +100,10 @@ export const useAppStore = create<AppState>()(
       activeTab: "dashboard",
       setActiveTab: (t) => set({ activeTab: t }),
 
-      points: 450,
+      points: 0,
       setPoints: (n) => set({ points: n }),
       addPoints: async (n) => {
+        if (!get().hasSubscription) return;
         const next = get().points + n;
         set({ points: next });
         const uid = get().user?.id;
