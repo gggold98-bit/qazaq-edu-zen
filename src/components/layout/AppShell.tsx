@@ -12,7 +12,6 @@ import {
   Coins,
   Moon,
   Sun,
-  ShieldCheck,
   Menu,
   X,
   FileText,
@@ -38,7 +37,6 @@ import { Whiteboard } from "@/components/modules/Whiteboard";
 import { LibraryModule } from "@/components/modules/LibraryModule";
 import { ComingSoon } from "@/components/modules/ComingSoon";
 import { Subscriptions } from "@/components/modules/Subscriptions";
-import { AdminUploader } from "@/components/modules/AdminUploader";
 
 function initials(name: string) {
   return name
@@ -52,7 +50,7 @@ function initials(name: string) {
 export function AppShell() {
   const {
     user, logout, activeTab, setActiveTab, points, theme, toggleTheme,
-    isAdminMode, toggleAdminMode, lang, setLang,
+    lang, setLang,
   } = useAppStore();
   const t = useT();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -71,8 +69,6 @@ export function AppShell() {
   ];
 
   if (!user) return null;
-
-  const activeKey: TabKey = isAdminMode ? "admin" : activeTab;
 
   return (
     <div className="flex min-h-screen">
@@ -96,11 +92,11 @@ export function AppShell() {
 
           <nav className="flex-1 space-y-1 px-3">
             {NAV.map((n) => {
-              const active = activeKey === n.key;
+              const active = activeTab === n.key;
               return (
                 <button
                   key={n.key}
-                  onClick={() => { setActiveTab(n.key); if (isAdminMode) toggleAdminMode(); setMobileOpen(false); }}
+                  onClick={() => { setActiveTab(n.key); setMobileOpen(false); }}
                   className={`group relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                     active
                       ? "bg-primary/10 text-primary"
@@ -119,23 +115,6 @@ export function AppShell() {
                 </button>
               );
             })}
-
-            <div className="my-4 h-px bg-border" />
-
-            <button
-              onClick={toggleAdminMode}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-                isAdminMode
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-              }`}
-            >
-              <ShieldCheck className="h-4 w-4" />
-              {t("Admin режимі", "Режим Admin", "Admin mode")}
-              <span className={`ml-auto h-5 w-9 rounded-full p-0.5 transition-colors ${isAdminMode ? "bg-primary" : "bg-muted"}`}>
-                <span className={`block h-4 w-4 rounded-full bg-white transition-transform ${isAdminMode ? "translate-x-4" : ""}`} />
-              </span>
-            </button>
           </nav>
 
           <div className="p-3">
@@ -193,23 +172,22 @@ export function AppShell() {
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div
-              key={activeKey}
+              key={activeTab}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
             >
-              {activeKey === "dashboard" && <Dashboard />}
-              {activeKey === "adilet" && <AdiletAI />}
-              {activeKey === "ai-kmj-bzhb" && <ComingSoon title={t("AI ҚМЖ және БЖБ-ТЖБ", "AI КСП и СОР-СОЧ", "AI Plans & Assessments")} />}
-              {activeKey === "ai-olympiad" && <ComingSoon title={t("AI Олимпиадаға дайындық", "AI Подготовка к олимпиаде", "AI Olympiad prep")} />}
-              {activeKey === "courses-podcasts" && <ComingSoon title={t("Курстар және Подкасттар", "Курсы и Подкасты", "Courses & Podcasts")} />}
-              {activeKey === "qaz-quiz" && <ComingSoon title={t("Qaz Quiz", "Qaz Quiz", "Qaz Quiz")} />}
-              {activeKey === "methodology" && <Methodology />}
-              {activeKey === "whiteboard" && <Whiteboard />}
-              {activeKey === "library" && <LibraryModule />}
-              {activeKey === "subscriptions" && <Subscriptions />}
-              {activeKey === "admin" && <AdminUploader />}
+              {activeTab === "dashboard" && <Dashboard />}
+              {activeTab === "adilet" && <AdiletAI />}
+              {activeTab === "ai-kmj-bzhb" && <ComingSoon title={t("AI ҚМЖ және БЖБ-ТЖБ", "AI КСП и СОР-СОЧ", "AI Plans & Assessments")} />}
+              {activeTab === "ai-olympiad" && <ComingSoon title={t("AI Олимпиадаға дайындық", "AI Подготовка к олимпиаде", "AI Olympiad prep")} />}
+              {activeTab === "courses-podcasts" && <ComingSoon title={t("Курстар және Подкасттар", "Курсы и Подкасты", "Courses & Podcasts")} />}
+              {activeTab === "qaz-quiz" && <ComingSoon title={t("Qaz Quiz", "Qaz Quiz", "Qaz Quiz")} />}
+              {activeTab === "methodology" && <Methodology />}
+              {activeTab === "whiteboard" && <Whiteboard />}
+              {activeTab === "library" && <LibraryModule />}
+              {activeTab === "subscriptions" && <Subscriptions />}
             </motion.div>
           </AnimatePresence>
         </main>

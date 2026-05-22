@@ -12,8 +12,8 @@ export type TabKey =
   | "methodology"
   | "whiteboard"
   | "library"
-  | "subscriptions"
-  | "admin";
+  | "subscriptions";
+
 
 export interface UserProfile {
   id: string;
@@ -55,11 +55,8 @@ interface AppState {
   setUnlockedItems: (ids: string[]) => void;
   unlockItem: (id: string) => Promise<void>;
 
-  // admin mode
-  isAdminMode: boolean;
-  toggleAdminMode: () => void;
-
   // language
+
   lang: "kk" | "ru" | "en";
   setLang: (l: "kk" | "ru" | "en") => void;
 
@@ -81,7 +78,6 @@ export const useAppStore = create<AppState>()(
         set({
           user: null,
           activeTab: "dashboard",
-          isAdminMode: false,
           points: 0,
           certificates: 3,
           unlockedItems: [],
@@ -138,9 +134,6 @@ export const useAppStore = create<AppState>()(
         const uid = get().user?.id;
         if (uid) await supabase.from("profiles").update({ unlocked_items: next }).eq("id", uid);
       },
-
-      isAdminMode: false,
-      toggleAdminMode: () => set({ isAdminMode: !get().isAdminMode }),
 
       lang: "kk",
       setLang: (l) => set({ lang: l }),

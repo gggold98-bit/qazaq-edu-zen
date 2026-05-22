@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useServerFn } from "@tanstack/react-start";
-import { Scale, Send, Plus, Trash2, FileText, Bot, User as UserIcon, ShieldCheck, Sparkles, Loader2 } from "lucide-react";
+import { Scale, Send, FileText, Bot, User as UserIcon, ShieldCheck, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,8 +24,6 @@ interface LegalDoc {
 interface Msg { role: "user" | "assistant"; content: string }
 
 export function AdiletAI() {
-  const user = useAppStore((s) => s.user);
-  const isAdminMode = useAppStore((s) => s.isAdminMode);
   const askAi = useServerFn(adiletChat);
 
   const [docs, setDocs] = useState<LegalDoc[]>([]);
@@ -41,12 +37,6 @@ export function AdiletAI() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // admin form
-  const [title, setTitle] = useState("");
-  const [docNumber, setDocNumber] = useState("");
-  const [category, setCategory] = useState("Бұйрық");
-  const [content, setContent] = useState("");
 
   const loadDocs = async () => {
     const { data, error } = await supabase
@@ -79,40 +69,6 @@ export function AdiletAI() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const addDoc = async () => {
-    if (!title.trim() || !content.trim()) {
-      toast.error("Атауы мен мәтінін толтырыңыз");
-      return;
-    }
-    if (!user) return;
-    const { error } = await supabase.from("legal_documents").insert({
-      title: title.trim(),
-      doc_number: docNumber.trim() || null,
-      category: category || null,
-      content: content.trim(),
-      added_by: user.id,
-    });
-    if (error) {
-      toast.error("Қосу мүмкін болмады: " + error.message);
-      return;
-    }
-    toast.success("Заң білім базасына қосылды");
-    setTitle(""); setDocNumber(""); setContent("");
-    loadDocs();
-  };
-
-  const removeDoc = async (id: string, addedBy: string | null) => {
-    if (!addedBy) {
-      toast.error("Жүйелік заңды жою мүмкін емес");
-      return;
-    }
-    const { error } = await supabase.from("legal_documents").delete().eq("id", id);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Жойылды");
-    if (selectedId === id) setSelectedId(null);
-    loadDocs();
   };
 
   const selectedDoc = docs.find((d) => d.id === selectedId);
@@ -174,15 +130,6 @@ export function AdiletAI() {
                           {d.title}
                         </div>
                       </button>
-                      {isAdminMode && !isSystem && (
-                        <button
-                          onClick={() => removeDoc(d.id, d.added_by)}
-                          className="opacity-0 transition-opacity group-hover:opacity-100"
-                          aria-label="Жою"
-                        >
-                          <Trash2 className="h-3.5 w-3.5 text-red-500" />
-                        </button>
-                      )}
                     </div>
                   );
                 })}
@@ -192,47 +139,6 @@ export function AdiletAI() {
               </div>
             </ScrollArea>
           </div>
-
-          {isAdminMode && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-[#dbe4f0] bg-white p-4 shadow-sm"
-            >
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#0c2a6b]">
-                <Plus className="h-4 w-4" /> Жаңа заң қосу
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-xs">Атауы *</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="«Білім туралы» Заң" />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-xs">Нөмірі</Label>
-                    <Input value={docNumber} onChange={(e) => setDocNumber(e.target.value)} placeholder="№ 472" />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Санаты</Label>
-                    <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Бұйрық" />
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs">Мәтіні *</Label>
-                  <Textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={6}
-                    placeholder="Заңның толық мәтінін немесе негізгі тармақтарын енгізіңіз..."
-                    className="resize-none text-xs"
-                  />
-                </div>
-                <Button onClick={addDoc} className="w-full bg-[#1d4ed8] hover:bg-[#1e40af]">
-                  <Plus className="mr-1 h-4 w-4" /> Базаға қосу
-                </Button>
-              </div>
-            </motion.div>
-          )}
         </aside>
 
         {/* Main: Chat or Doc Viewer */}
