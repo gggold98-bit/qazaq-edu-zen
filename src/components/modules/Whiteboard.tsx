@@ -280,7 +280,7 @@ export function Whiteboard() {
    ========================================================= */
 type Tool = "pen" | "eraser";
 
-function Canvas() {
+function Canvas({ fullscreen, onToggleFullscreen }: { fullscreen: boolean; onToggleFullscreen: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [color, setColor] = useState("#6366f1");
   const [width, setWidth] = useState(4);
@@ -303,8 +303,8 @@ function Canvas() {
     const resize = () => {
       const rect = c.parentElement!.getBoundingClientRect();
       const data = c.toDataURL();
-      c.width = rect.width;
-      c.height = 460;
+      c.width = Math.max(1, Math.floor(rect.width));
+      c.height = Math.max(1, Math.floor(fullscreen ? rect.height : 460));
       const img = new Image();
       img.onload = () => c.getContext("2d")?.drawImage(img, 0, 0);
       img.src = data;
@@ -312,7 +312,7 @@ function Canvas() {
     resize();
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
-  }, []);
+  }, [fullscreen]);
 
   const ctx = () => canvasRef.current!.getContext("2d")!;
 
