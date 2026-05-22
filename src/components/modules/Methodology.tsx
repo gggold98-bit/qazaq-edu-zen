@@ -94,48 +94,8 @@ export function Methodology() {
             <MapPin className="h-4 w-4 shrink-0" />
             <span className="font-medium">{t("Ақмола облысының әдістемелік кабинеті", "Методический кабинет Акмолинской области", "Akmola region methodology cabinet")}</span>
           </div>
+          {renderPlaceholder()}
 
-          <Tabs value={docTab} onValueChange={setDocTab}>
-            <TabsList className="glass rounded-xl p-1">
-              {DOCS_TABS.map((tb) => (
-                <TabsTrigger key={tb.value} value={tb.value} className="rounded-lg data-[state=active]:gradient-emerald data-[state=active]:text-white">
-                  <tb.icon className="mr-2 h-4 w-4" />
-                  {tb.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((it) => {
-              const unlocked = unlockedItems.includes(it.id) || it.cost === 0;
-              return (
-                <div key={it.id} className="glass group relative overflow-hidden rounded-2xl p-5 transition-transform hover:-translate-y-1">
-                  <div className="mb-4 flex items-start justify-end">
-                    {!unlocked && <Lock className="h-4 w-4 text-muted-foreground" />}
-                  </div>
-                  <h3 className="line-clamp-2 text-base font-semibold">{it.title}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">{it.size}</p>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <div className="text-sm">
-                      {it.cost === 0 ? (
-                        <span className="font-medium text-primary">{t("Тегін", "Бесплатно", "Free")}</span>
-                      ) : unlocked ? (
-                        <span className="text-primary">✓ {t("Ашылды", "Открыто", "Unlocked")}</span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-muted-foreground"><Coins className="h-3.5 w-3.5" />{it.cost} {t("ұпай", "баллов", "pts")}</span>
-                      )}
-                    </div>
-                    <Button size="sm" variant={unlocked ? "default" : "outline"} onClick={() => handleUnlock(it)} className={unlocked ? "gradient-emerald gap-1.5" : "gap-1.5"}>
-                      {unlocked ? <Download className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-                      {unlocked ? t("Жүктеу", "Скачать", "Download") : t("Ашу", "Открыть", "Unlock")}
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       )}
 
