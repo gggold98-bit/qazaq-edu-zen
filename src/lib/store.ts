@@ -12,8 +12,8 @@ export type TabKey =
   | "methodology"
   | "whiteboard"
   | "library"
-  | "subscriptions"
-  | "admin";
+  | "subscriptions";
+
 
 export interface UserProfile {
   id: string;
