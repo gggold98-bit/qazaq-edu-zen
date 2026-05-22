@@ -16,9 +16,8 @@ import {
   Menu,
   X,
   FileText,
-  ClipboardList,
   Trophy,
-  Mic,
+  HelpCircle,
 } from "lucide-react";
 import { useAppStore, type TabKey } from "@/lib/store";
 import { useT } from "@/lib/i18n";
