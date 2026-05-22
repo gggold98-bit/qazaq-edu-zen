@@ -78,7 +78,6 @@ export const useAppStore = create<AppState>()(
         set({
           user: null,
           activeTab: "dashboard",
-          isAdminMode: false,
           points: 0,
           certificates: 3,
           unlockedItems: [],
