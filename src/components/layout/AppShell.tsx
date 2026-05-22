@@ -18,6 +18,7 @@ import {
   FileText,
   Trophy,
   HelpCircle,
+  Clock,
 } from "lucide-react";
 import { useAppStore, type TabKey } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -30,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Dashboard } from "@/components/modules/Dashboard";
+import { Dashboard, AstanaClock } from "@/components/modules/Dashboard";
 import { AdiletAI } from "@/components/modules/AdiletAI";
 import { Methodology } from "@/components/modules/Methodology";
 import { Whiteboard } from "@/components/modules/Whiteboard";
@@ -158,6 +159,11 @@ export function AppShell() {
             <div className="glass hidden items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold sm:flex">
               <Coins className="h-4 w-4 text-primary" />
               <span>{points.toLocaleString("kk-KZ")} {t("ұпай", "баллов", "points")}</span>
+            </div>
+
+            <div className="glass hidden items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold sm:flex" title={t("Астана уақыты", "Время Астаны", "Astana time")}>
+              <Clock className="h-4 w-4 text-primary" />
+              <AstanaClock />
             </div>
 
             <Select value={lang} onValueChange={(v) => setLang(v as "kk" | "ru" | "en")}>
