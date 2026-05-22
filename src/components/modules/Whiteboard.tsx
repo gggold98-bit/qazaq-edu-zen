@@ -804,8 +804,14 @@ function StudentPicker() {
                 const y1 = r + (r - 4) * Math.sin(a1);
                 const large = slice > Math.PI ? 1 : 0;
                 const mid = a0 + slice / 2;
-                const tx = r + (r - 60) * Math.cos(mid);
-                const ty = r + (r - 60) * Math.sin(mid);
+                const midDeg = (mid * 180) / Math.PI;
+                // Available radial track for text (from hub to rim)
+                const trackLen = r - 38;
+                // Slice arc width at mid-radius limits the font height
+                const arcAtMid = slice * (r * 0.6);
+                // Estimate font size so the name fits along the radial track
+                const byLength = (trackLen * 1.7) / Math.max(name.length, 1);
+                const fontSize = Math.max(8, Math.min(15, arcAtMid * 0.55, byLength));
                 return (
                   <g key={`${name}-${i}`}>
                     <path
@@ -815,16 +821,19 @@ function StudentPicker() {
                       strokeWidth="2"
                     />
                     <text
-                      x={tx}
-                      y={ty}
+                      x={r + trackLen}
+                      y={r}
                       fill="#fff"
-                      fontSize="13"
+                      fontSize={fontSize}
                       fontWeight="700"
-                      textAnchor="middle"
+                      textAnchor="end"
                       dominantBaseline="middle"
-                      transform={`rotate(${(mid * 180) / Math.PI + 90} ${tx} ${ty})`}
+                      transform={`rotate(${midDeg} ${r} ${r})`}
+                      style={{ paintOrder: "stroke" }}
+                      stroke="rgba(0,0,0,0.25)"
+                      strokeWidth="0.6"
                     >
-                      {name.length > 12 ? name.slice(0, 11) + "…" : name}
+                      {name}
                     </text>
                   </g>
                 );
