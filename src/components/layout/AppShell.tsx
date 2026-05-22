@@ -161,6 +161,11 @@ export function AppShell() {
               <span>{points.toLocaleString("kk-KZ")} {t("ұпай", "баллов", "points")}</span>
             </div>
 
+            <div className="glass hidden items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold sm:flex" title={t("Астана уақыты", "Время Астаны", "Astana time")}>
+              <Clock className="h-4 w-4 text-primary" />
+              <AstanaClock />
+            </div>
+
             <Select value={lang} onValueChange={(v) => setLang(v as "kk" | "ru" | "en")}>
               <SelectTrigger className="h-9 w-[80px] rounded-full">
                 <SelectValue />
