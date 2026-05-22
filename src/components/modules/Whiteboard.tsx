@@ -729,10 +729,19 @@ function StudentPicker() {
     window.setTimeout(() => {
       if (tickIntervalRef.current) clearTimeout(tickIntervalRef.current);
       setSpinning(false);
-      setWinner(names[idx]);
+      const chosen = names[idx];
+      setWinner(chosen);
       setShowWinner(true);
       setConfetti(true);
       audio.fanfare();
+      // Auto-remove the selected student from the list
+      setRaw((prev) =>
+        prev
+          .split(/\n|,/g)
+          .map((s) => s.trim())
+          .filter((s) => s && s !== chosen)
+          .join("\n"),
+      );
       window.setTimeout(() => setConfetti(false), 2200);
     }, duration);
   };
