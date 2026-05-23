@@ -116,6 +116,133 @@ export type Database = {
         }
         Relationships: []
       }
+      qq_questions: {
+        Row: {
+          correct_index: number
+          created_at: string
+          id: string
+          idx: number
+          image_url: string | null
+          options: Json
+          points: number
+          qtype: string
+          quiz_id: string
+          text: string
+          time_limit_sec: number
+        }
+        Insert: {
+          correct_index?: number
+          created_at?: string
+          id?: string
+          idx?: number
+          image_url?: string | null
+          options?: Json
+          points?: number
+          qtype?: string
+          quiz_id: string
+          text: string
+          time_limit_sec?: number
+        }
+        Update: {
+          correct_index?: number
+          created_at?: string
+          id?: string
+          idx?: number
+          image_url?: string | null
+          options?: Json
+          points?: number
+          qtype?: string
+          quiz_id?: string
+          text?: string
+          time_limit_sec?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qq_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "qq_quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qq_quizzes: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          lang: string
+          owner_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lang?: string
+          owner_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lang?: string
+          owner_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      qq_sessions: {
+        Row: {
+          created_at: string
+          current_index: number
+          host_id: string
+          id: string
+          pin: string
+          quiz_id: string
+          status: string
+          summary: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_index?: number
+          host_id: string
+          id?: string
+          pin: string
+          quiz_id: string
+          status?: string
+          summary?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_index?: number
+          host_id?: string
+          id?: string
+          pin?: string
+          quiz_id?: string
+          status?: string
+          summary?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qq_sessions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "qq_quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       test_attempts: {
         Row: {
           created_at: string
