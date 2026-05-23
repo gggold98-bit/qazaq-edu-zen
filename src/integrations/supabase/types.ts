@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      asked_questions: {
+        Row: {
+          created_at: string
+          grade: number
+          id: string
+          question: string
+          subject: string
+          topic: string | null
+          user_id: string
+          was_correct: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          grade: number
+          id?: string
+          question: string
+          subject: string
+          topic?: string | null
+          user_id: string
+          was_correct?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          grade?: number
+          id?: string
+          question?: string
+          subject?: string
+          topic?: string | null
+          user_id?: string
+          was_correct?: boolean | null
+        }
+        Relationships: []
+      }
       legal_documents: {
         Row: {
           added_by: string | null
@@ -79,6 +112,69 @@ export type Database = {
           id?: string
           points?: number
           unlocked_items?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      test_attempts: {
+        Row: {
+          created_at: string
+          grade: number
+          id: string
+          percent: number
+          score: number
+          subject: string
+          total: number
+          user_id: string
+          weak_topics: Json
+        }
+        Insert: {
+          created_at?: string
+          grade: number
+          id?: string
+          percent: number
+          score: number
+          subject: string
+          total: number
+          user_id: string
+          weak_topics?: Json
+        }
+        Update: {
+          created_at?: string
+          grade?: number
+          id?: string
+          percent?: number
+          score?: number
+          subject?: string
+          total?: number
+          user_id?: string
+          weak_topics?: Json
+        }
+        Relationships: []
+      }
+      textbook_content: {
+        Row: {
+          content: string
+          created_at: string
+          grade: number
+          id: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          grade: number
+          id?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          grade?: number
+          id?: string
+          subject?: string
           updated_at?: string
         }
         Relationships: []
