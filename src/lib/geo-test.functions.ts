@@ -117,12 +117,18 @@ ${excludeList.length ? excludeList.map((q, i) => `${i + 1}. ${q}`).join("\n") : 
           q.correctIndex < 4
         );
       })
-      .map((q) => ({
-        question: String(q.question),
-        options: (q.options as unknown[]).map((o) => String(o)),
-        correctIndex: Number(q.correctIndex),
-        topic: typeof q.topic === "string" ? q.topic : "Жалпы",
-      }))
+      .map((q) => {
+        const imageQuery = typeof q.imageQuery === "string" ? q.imageQuery.trim() : "";
+        return {
+          question: String(q.question),
+          options: (q.options as unknown[]).map((o) => String(o)),
+          correctIndex: Number(q.correctIndex),
+          topic: typeof q.topic === "string" ? q.topic : "Жалпы",
+          imageUrl: imageQuery
+            ? `https://loremflickr.com/640/360/${encodeURIComponent(imageQuery)}?lock=${Math.abs(hashStr(imageQuery))}`
+            : undefined,
+        };
+      })
       .slice(0, count);
 
     if (questions.length === 0) throw new Error("AI сұрақ құрастыра алмады, қайталап көріңіз.");
