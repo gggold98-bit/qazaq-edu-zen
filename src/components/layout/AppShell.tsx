@@ -37,6 +37,7 @@ import { Whiteboard } from "@/components/modules/Whiteboard";
 import { LibraryModule } from "@/components/modules/LibraryModule";
 import { ComingSoon } from "@/components/modules/ComingSoon";
 import { Subscriptions } from "@/components/modules/Subscriptions";
+import { AIOlympiad } from "@/components/modules/AIOlympiad";
 
 function initials(name: string) {
   return name
@@ -181,7 +182,7 @@ export function AppShell() {
               {activeTab === "dashboard" && <Dashboard />}
               {activeTab === "adilet" && <AdiletAI />}
               {activeTab === "ai-kmj-bzhb" && <ComingSoon title={t("AI ҚМЖ және БЖБ-ТЖБ", "AI КСП и СОР-СОЧ", "AI Plans & Assessments")} />}
-              {activeTab === "ai-olympiad" && <ComingSoon title={t("AI Олимпиадаға дайындық", "AI Подготовка к олимпиаде", "AI Olympiad prep")} />}
+              {activeTab === "ai-olympiad" && <AIOlympiad />}
               {activeTab === "courses-podcasts" && <ComingSoon title={t("Курстар және Подкасттар", "Курсы и Подкасты", "Courses & Podcasts")} />}
               {activeTab === "qaz-quiz" && <ComingSoon title={t("Qaz Quiz", "Qaz Quiz", "Qaz Quiz")} />}
               {activeTab === "methodology" && <Methodology />}
