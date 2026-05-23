@@ -211,7 +211,7 @@ function GeoTestPage() {
                     })}
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-glass-border pt-4">
+                  <div className="sticky bottom-0 -mx-8 mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-glass-border bg-background/95 px-8 py-4 backdrop-blur sm:-mx-10 sm:px-10">
                     <Button
                       variant="ghost"
                       onClick={() => setCurrent((c) => Math.max(0, c - 1))}
