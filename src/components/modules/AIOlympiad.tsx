@@ -54,6 +54,7 @@ const GRADES = [5, 6, 7, 8, 9, 10, 11];
 
 export function AIOlympiad() {
   const t = useT();
+  const navigate = useNavigate();
   const [track, setTrack] = useState<TrackKey | null>(null);
   const [openSubject, setOpenSubject] = useState<number | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<{ subject: number; grade: number } | null>(null);
