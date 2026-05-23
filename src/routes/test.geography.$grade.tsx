@@ -158,13 +158,13 @@ function GeoTestPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="flex flex-1 flex-col gap-6 overflow-y-auto p-8 sm:p-10"
+                  className="flex flex-1 flex-col gap-4 overflow-y-auto p-5 pb-28 sm:gap-6 sm:p-8 sm:pb-32 lg:p-10 lg:pb-36"
                 >
                   <div>
                     <div className="mb-2 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
                       {questions[current].topic}
                     </div>
-                    <h2 className="text-2xl font-semibold leading-tight sm:text-3xl">
+                    <h2 className="text-lg font-semibold leading-snug sm:text-2xl sm:leading-tight lg:text-3xl">
                       {current + 1}. {questions[current].question}
                     </h2>
                   </div>
@@ -173,7 +173,7 @@ function GeoTestPage() {
                       <img
                         src={questions[current].imageUrl}
                         alt="Сұраққа қатысты фото"
-                        className="mx-auto block max-h-[280px] w-auto object-contain"
+                        className="mx-auto block max-h-[180px] w-auto object-contain sm:max-h-[240px] lg:max-h-[280px]"
                         loading="lazy"
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -181,7 +181,7 @@ function GeoTestPage() {
                       />
                     </div>
                   )}
-                  <div className="grid flex-1 gap-3 sm:grid-cols-2">
+                  <div className="grid flex-1 gap-2 sm:grid-cols-2 sm:gap-3">
                     {questions[current].options.map((opt, i) => {
                       const active = answers[current] === i;
                       return (
@@ -192,28 +192,29 @@ function GeoTestPage() {
                             next[current] = i;
                             setAnswers(next);
                           }}
-                          className={`group flex items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
+                          className={`group flex items-start gap-2 rounded-2xl border p-2.5 text-left transition-all sm:gap-3 sm:p-3 lg:p-4 ${
                             active
                               ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
                               : "border-glass-border bg-card/40 hover:border-primary/40 hover:bg-accent/40"
                           }`}
                         >
                           <span
-                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:h-7 sm:w-7 sm:text-sm lg:h-8 lg:w-8 ${
                               active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
                             }`}
                           >
                             {String.fromCharCode(65 + i)}
                           </span>
-                          <span className="pt-1 text-base">{opt}</span>
+                          <span className="pt-0 text-sm sm:pt-0.5 sm:text-base">{opt}</span>
                         </button>
                       );
                     })}
                   </div>
 
-                  <div className="sticky bottom-0 -mx-8 mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-glass-border bg-background/95 px-8 py-4 backdrop-blur sm:-mx-10 sm:px-10">
+                  <div className="sticky bottom-0 -mx-5 mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-glass-border bg-background/95 px-5 py-2.5 backdrop-blur sm:-mx-8 sm:gap-3 sm:px-8 sm:py-3 lg:px-10 lg:py-4">
                     <Button
                       variant="ghost"
+                      size="sm"
                       onClick={() => setCurrent((c) => Math.max(0, c - 1))}
                       disabled={current === 0}
                     >
@@ -225,6 +226,7 @@ function GeoTestPage() {
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
+                        size="sm"
                         onClick={() => {
                           const unanswered = questions.length - answered;
                           const msg =
@@ -239,6 +241,7 @@ function GeoTestPage() {
                       </Button>
                       {current < questions.length - 1 ? (
                         <Button
+                          size="sm"
                           onClick={() => setCurrent((c) => Math.min(questions.length - 1, c + 1))}
                           disabled={answers[current] < 0}
                         >
@@ -246,6 +249,7 @@ function GeoTestPage() {
                         </Button>
                       ) : (
                         <Button
+                          size="sm"
                           onClick={submit}
                           disabled={answers[current] < 0 || submitting}
                           className="gradient-emerald text-white"
