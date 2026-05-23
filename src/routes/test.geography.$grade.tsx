@@ -109,25 +109,42 @@ function GeoTestPage() {
     navigate({ to: "/" });
   };
 
+  const progress = questions.length > 0 ? (answered / questions.length) * 100 : 0;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4 dark:from-emerald-950/40 dark:via-background dark:to-sky-950/40">
-      {/* 16:9 stage */}
-      <div className="relative w-full max-w-[1600px]" style={{ aspectRatio: "16 / 9" }}>
-        <div className="relative h-full w-full overflow-hidden rounded-3xl border border-glass-border bg-background/80 shadow-2xl shadow-primary/10 backdrop-blur-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-0 dark:from-emerald-950/40 dark:via-background dark:to-sky-950/40 sm:p-4 lg:p-6">
+      {/* Responsive stage: full screen on mobile, 16:9 on desktop */}
+      <div className="relative h-full w-full max-w-[1600px] lg:h-auto lg:[aspect-ratio:16/9]">
+        <div className="relative flex h-full w-full flex-col overflow-hidden border-glass-border bg-background/80 shadow-2xl shadow-primary/10 backdrop-blur-xl sm:rounded-2xl sm:border lg:rounded-3xl">
           {/* top bar */}
-          <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-4 border-b border-glass-border bg-background/70 px-6 py-3 backdrop-blur">
-            <Button variant="ghost" size="sm" onClick={exit} className="gap-2">
-              <ArrowLeft className="h-4 w-4" /> Шығу
+          <div className="z-10 flex shrink-0 items-center justify-between gap-2 border-b border-glass-border bg-background/70 px-3 py-2.5 backdrop-blur sm:px-6 sm:py-3">
+            <Button variant="ghost" size="sm" onClick={exit} className="gap-1.5 px-2 sm:px-3">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Шығу</span>
             </Button>
-            <div className="text-sm font-medium text-muted-foreground">
+            <div className="hidden truncate text-sm font-medium text-muted-foreground sm:block">
               География · {grade}-сынып
             </div>
-            <div className="text-sm font-semibold">
-              {phase === "test" ? `${current + 1} / ${questions.length}` : phase === "loading" ? "Дайындалуда…" : "Нәтиже"}
+            <div className="text-sm font-semibold tabular-nums">
+              {phase === "test"
+                ? `${current + 1} / ${questions.length}`
+                : phase === "loading"
+                ? "…"
+                : "Нәтиже"}
             </div>
           </div>
 
-          <div className="flex h-full flex-col pt-16">
+          {/* progress bar */}
+          {phase === "test" && (
+            <div className="h-1 w-full shrink-0 bg-muted/40">
+              <div
+                className="gradient-emerald h-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
+
+          <div className="flex min-h-0 flex-1 flex-col">
             <AnimatePresence mode="wait">
               {phase === "loading" && (
                 <motion.div
@@ -135,10 +152,10 @@ function GeoTestPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center"
+                  className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center sm:p-8"
                 >
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                  <h2 className="text-2xl font-semibold">AI сұрақтарды құрастыруда…</h2>
+                  <h2 className="text-xl font-semibold sm:text-2xl">AI сұрақтарды құрастыруда…</h2>
                   <p className="max-w-md text-sm text-muted-foreground">
                     Жүктелген оқулық негізінде {grade}-сыныпқа арналған 30 жаңа сұрақ дайындалуда. Бұл 10–20 секунд алады.
                   </p>
@@ -152,101 +169,125 @@ function GeoTestPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="flex flex-1 flex-col gap-6 overflow-y-auto p-8 sm:p-10"
+                  className="flex min-h-0 flex-1 flex-col"
                 >
-                  <div>
-                    <div className="mb-2 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                      {questions[current].topic}
+                  <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                    <div className="mx-auto flex max-w-4xl flex-col gap-5">
+                      <div>
+                        <div className="mb-2 inline-flex rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
+                          {questions[current].topic}
+                        </div>
+                        <h2 className="text-lg font-semibold leading-snug sm:text-2xl lg:text-3xl">
+                          {current + 1}. {questions[current].question}
+                        </h2>
+                      </div>
+                      {questions[current].imageUrl && (
+                        <div className="overflow-hidden rounded-2xl border border-glass-border bg-muted/30">
+                          <img
+                            src={questions[current].imageUrl}
+                            alt="Сұраққа қатысты фото"
+                            className="mx-auto block max-h-[200px] w-auto object-contain sm:max-h-[260px]"
+                            loading="lazy"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
+                        {questions[current].options.map((opt, i) => {
+                          const active = answers[current] === i;
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => {
+                                const next = [...answers];
+                                next[current] = i;
+                                setAnswers(next);
+                              }}
+                              className={`group flex items-start gap-3 rounded-2xl border p-3.5 text-left transition-all sm:p-4 ${
+                                active
+                                  ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                                  : "border-glass-border bg-card/40 hover:border-primary/40 hover:bg-accent/40"
+                              }`}
+                            >
+                              <span
+                                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:h-8 sm:w-8 sm:text-sm ${
+                                  active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                                }`}
+                              >
+                                {String.fromCharCode(65 + i)}
+                              </span>
+                              <span className="pt-0.5 text-sm leading-snug sm:pt-1 sm:text-base">{opt}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <h2 className="text-2xl font-semibold leading-tight sm:text-3xl">
-                      {current + 1}. {questions[current].question}
-                    </h2>
-                  </div>
-                  {questions[current].imageUrl && (
-                    <div className="overflow-hidden rounded-2xl border border-glass-border bg-muted/30">
-                      <img
-                        src={questions[current].imageUrl}
-                        alt="Сұраққа қатысты фото"
-                        className="mx-auto block max-h-[280px] w-auto object-contain"
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="grid flex-1 gap-3 sm:grid-cols-2">
-                    {questions[current].options.map((opt, i) => {
-                      const active = answers[current] === i;
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            const next = [...answers];
-                            next[current] = i;
-                            setAnswers(next);
-                          }}
-                          className={`group flex items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
-                            active
-                              ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
-                              : "border-glass-border bg-card/40 hover:border-primary/40 hover:bg-accent/40"
-                          }`}
-                        >
-                          <span
-                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                              active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-                            }`}
-                          >
-                            {String.fromCharCode(65 + i)}
-                          </span>
-                          <span className="pt-1 text-base">{opt}</span>
-                        </button>
-                      );
-                    })}
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-glass-border pt-4">
-                    <Button
-                      variant="ghost"
-                      onClick={() => setCurrent((c) => Math.max(0, c - 1))}
-                      disabled={current === 0}
-                    >
-                      ← Алдыңғы
-                    </Button>
-                    <div className="text-xs text-muted-foreground">
-                      Жауап берілді: {answered} / {questions.length}
-                    </div>
-                    <div className="flex items-center gap-2">
+                  {/* Sticky bottom bar */}
+                  <div className="shrink-0 border-t border-glass-border bg-background/80 backdrop-blur">
+                    <div className="mx-auto flex max-w-4xl flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:p-4">
+                      <div className="flex items-center justify-between gap-2 sm:flex-row-reverse sm:justify-end">
+                        <div className="text-xs tabular-nums text-muted-foreground">
+                          {answered} / {questions.length}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCurrent((c) => Math.max(0, c - 1))}
+                          disabled={current === 0}
+                          className="sm:hidden"
+                        >
+                          ← Алдыңғы
+                        </Button>
+                      </div>
                       <Button
-                        variant="outline"
-                        onClick={() => {
-                          const unanswered = questions.length - answered;
-                          const msg =
-                            unanswered > 0
-                              ? `Тестті қазір аяқтайсыз ба? ${unanswered} сұраққа жауап берілмеген, олар қате болып есептеледі.`
-                              : "Тестті аяқтап, нәтижені көресіз бе?";
-                          if (confirm(msg)) void submit();
-                        }}
-                        disabled={submitting}
+                        variant="ghost"
+                        onClick={() => setCurrent((c) => Math.max(0, c - 1))}
+                        disabled={current === 0}
+                        className="hidden sm:inline-flex"
                       >
-                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Тестті аяқтау"}
+                        ← Алдыңғы
                       </Button>
-                      {current < questions.length - 1 ? (
+                      <div className="flex items-center gap-2">
                         <Button
-                          onClick={() => setCurrent((c) => Math.min(questions.length - 1, c + 1))}
-                          disabled={answers[current] < 0}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const unanswered = questions.length - answered;
+                            const msg =
+                              unanswered > 0
+                                ? `Тестті қазір аяқтайсыз ба? ${unanswered} сұраққа жауап берілмеген, олар қате болып есептеледі.`
+                                : "Тестті аяқтап, нәтижені көресіз бе?";
+                            if (confirm(msg)) void submit();
+                          }}
+                          disabled={submitting}
+                          className="flex-1 sm:flex-none"
                         >
-                          Келесі →
+                          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Аяқтау"}
                         </Button>
-                      ) : (
-                        <Button
-                          onClick={submit}
-                          disabled={answers[current] < 0 || submitting}
-                          className="gradient-emerald text-white"
-                        >
-                          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Соңғы → нәтиже"}
-                        </Button>
-                      )}
+                        {current < questions.length - 1 ? (
+                          <Button
+                            size="sm"
+                            onClick={() => setCurrent((c) => Math.min(questions.length - 1, c + 1))}
+                            disabled={answers[current] < 0}
+                            className="flex-1 sm:flex-none"
+                          >
+                            Келесі →
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={submit}
+                            disabled={answers[current] < 0 || submitting}
+                            className="gradient-emerald flex-1 text-white sm:flex-none"
+                          >
+                            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Нәтиже"}
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
