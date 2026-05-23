@@ -74,19 +74,19 @@ export function AdiletAI() {
   const selectedDoc = docs.find((d) => d.id === selectedId);
 
   return (
-    <div className="adilet-theme -m-4 sm:-m-6 lg:-m-8 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#f1f5fb] via-white to-[#e8eef7] p-4 sm:p-6 lg:p-8">
+    <div className="adilet-theme -m-4 sm:-m-6 lg:-m-8 min-h-[calc(100vh-4rem)] bg-gradient-to-br from-[#f1f5fb] via-white to-[#e8eef7] p-3 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-4 rounded-2xl border border-[#dbe4f0] bg-white p-5 shadow-sm">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#1d4ed8] to-[#0c2a6b] shadow-md">
-          <Scale className="h-6 w-6 text-white" />
+      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#dbe4f0] bg-white p-3 shadow-sm sm:mb-6 sm:gap-4 sm:p-5">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#1d4ed8] to-[#0c2a6b] shadow-md sm:h-12 sm:w-12">
+          <Scale className="h-5 w-5 text-white sm:h-6 sm:w-6" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight text-[#0c2a6b] sm:text-2xl">Әділет AI</h1>
-            <Badge className="bg-[#1d4ed8] hover:bg-[#1d4ed8]">Ресми</Badge>
+            <h1 className="truncate text-lg font-bold tracking-tight text-[#0c2a6b] sm:text-2xl">Әділет AI</h1>
+            <Badge className="bg-[#1d4ed8] text-[10px] hover:bg-[#1d4ed8] sm:text-xs">Ресми</Badge>
           </div>
-          <p className="text-sm text-slate-600">
-            Қазақстан Республикасының білім беру заңнамасы бойынша құқықтық ИИ-кеңесші
+          <p className="line-clamp-1 text-xs text-slate-600 sm:text-sm">
+            ҚР білім беру заңнамасы бойынша ИИ-кеңесші
           </p>
         </div>
         <div className="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 sm:flex">
@@ -94,7 +94,7 @@ export function AdiletAI() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[320px_1fr] lg:gap-6">
         {/* Sidebar: Knowledge Base */}
         <aside className="space-y-4">
           <div className="rounded-2xl border border-[#dbe4f0] bg-white shadow-sm">
@@ -105,7 +105,7 @@ export function AdiletAI() {
               </div>
               <FileText className="h-4 w-4 text-[#1d4ed8]" />
             </div>
-            <ScrollArea className="h-[360px]">
+            <ScrollArea className="h-[220px] lg:h-[360px]">
               <div className="space-y-1 p-2">
                 {docs.map((d) => {
                   const isSystem = !d.added_by;
@@ -140,6 +140,7 @@ export function AdiletAI() {
             </ScrollArea>
           </div>
         </aside>
+
 
         {/* Main: Chat or Doc Viewer */}
         <section className="flex h-[720px] flex-col rounded-2xl border border-[#dbe4f0] bg-white shadow-sm">
