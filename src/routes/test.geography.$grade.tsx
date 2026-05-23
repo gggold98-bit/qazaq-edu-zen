@@ -162,6 +162,19 @@ function GeoTestPage() {
                       {current + 1}. {questions[current].question}
                     </h2>
                   </div>
+                  {questions[current].imageUrl && (
+                    <div className="overflow-hidden rounded-2xl border border-glass-border bg-muted/30">
+                      <img
+                        src={questions[current].imageUrl}
+                        alt="Сұраққа қатысты фото"
+                        className="mx-auto block max-h-[280px] w-auto object-contain"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )}
                   <div className="grid flex-1 gap-3 sm:grid-cols-2">
                     {questions[current].options.map((opt, i) => {
                       const active = answers[current] === i;
@@ -192,7 +205,7 @@ function GeoTestPage() {
                     })}
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 border-t border-glass-border pt-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-glass-border pt-4">
                     <Button
                       variant="ghost"
                       onClick={() => setCurrent((c) => Math.max(0, c - 1))}
@@ -203,22 +216,38 @@ function GeoTestPage() {
                     <div className="text-xs text-muted-foreground">
                       Жауап берілді: {answered} / {questions.length}
                     </div>
-                    {current < questions.length - 1 ? (
+                    <div className="flex items-center gap-2">
                       <Button
-                        onClick={() => setCurrent((c) => Math.min(questions.length - 1, c + 1))}
-                        disabled={answers[current] < 0}
+                        variant="outline"
+                        onClick={() => {
+                          const unanswered = questions.length - answered;
+                          const msg =
+                            unanswered > 0
+                              ? `Тестті қазір аяқтайсыз ба? ${unanswered} сұраққа жауап берілмеген, олар қате болып есептеледі.`
+                              : "Тестті аяқтап, нәтижені көресіз бе?";
+                          if (confirm(msg)) void submit();
+                        }}
+                        disabled={submitting}
                       >
-                        Келесі →
+                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Тестті аяқтау"}
                       </Button>
-                    ) : (
-                      <Button
-                        onClick={submit}
-                        disabled={answered < questions.length || submitting}
-                        className="gradient-emerald text-white"
-                      >
-                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Аяқтау"}
-                      </Button>
-                    )}
+                      {current < questions.length - 1 ? (
+                        <Button
+                          onClick={() => setCurrent((c) => Math.min(questions.length - 1, c + 1))}
+                          disabled={answers[current] < 0}
+                        >
+                          Келесі →
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={submit}
+                          disabled={answers[current] < 0 || submitting}
+                          className="gradient-emerald text-white"
+                        >
+                          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Соңғы → нәтиже"}
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               )}

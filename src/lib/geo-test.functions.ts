@@ -6,6 +6,7 @@ export interface GeoQuestion {
   options: string[];
   correctIndex: number;
   topic: string;
+  imageUrl?: string;
 }
 
 interface GenInput {
@@ -15,6 +16,12 @@ interface GenInput {
 }
 
 const SUBJECT = "geography";
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+}
 
 async function callAI(systemPrompt: string, userPrompt: string) {
   const apiKey = process.env.LOVABLE_API_KEY;
@@ -83,10 +90,12 @@ export const generateGeoTest = createServerFn({ method: "POST" })
 3. Сұрақтар әртүрлі бөлімдерден алынсын (литосфера, атмосфера, гидросфера, биосфера, экономика, картография т.б. — оқулықта барларынан).
 4. Сұрақтарды араластыр.
 5. Төмендегі ҚАЙТАЛАНБАУ ТІЗІМІНДЕГІ сұрақтарды қайта берме (мағынасы жағынан да ұқсамасын).${focusBlock}
+6. Сұрақтардың шамамен 30%-ы фотомен берілсін. Ондай сұрақтарға міндетті түрде "imageQuery" деген өрісте 2-4 ағылшын сөзімен суретке қажетті визуалды кілт сөздер қой (мысалы: "Caspian Sea coast", "Tien Shan mountains", "tropical rainforest", "volcano eruption", "river delta"). Тек география контекстіндегі нақты нысандар мен табиғи құбылыстар үшін қой. Сұрақ мәтіні фотоға сүйеніп жауап беруге мүмкіндік берсін (мысалы: "Суретте қандай табиғат зонасы бейнеленген?").
 
 ҚАЙТАРЫЛАТЫН JSON ФОРМАТЫ:
-{"questions":[{"question":"...","options":["A","B","C","D"],"correctIndex":0,"topic":"Литосфера"}, ...]}
+{"questions":[{"question":"...","options":["A","B","C","D"],"correctIndex":0,"topic":"Литосфера","imageQuery":"Tien Shan mountains"}, ...]}
 
+imageQuery өрісі міндетті емес, тек суретке байланысты сұрақтарға қой.
 Тек JSON қайтар, басқа мәтін қоспа.`;
 
     const user = `===== ОҚУЛЫҚ (${grade}-сынып) =====
@@ -114,12 +123,18 @@ ${excludeList.length ? excludeList.map((q, i) => `${i + 1}. ${q}`).join("\n") : 
           q.correctIndex < 4
         );
       })
-      .map((q) => ({
-        question: String(q.question),
-        options: (q.options as unknown[]).map((o) => String(o)),
-        correctIndex: Number(q.correctIndex),
-        topic: typeof q.topic === "string" ? q.topic : "Жалпы",
-      }))
+      .map((q) => {
+        const imageQuery = typeof q.imageQuery === "string" ? q.imageQuery.trim() : "";
+        return {
+          question: String(q.question),
+          options: (q.options as unknown[]).map((o) => String(o)),
+          correctIndex: Number(q.correctIndex),
+          topic: typeof q.topic === "string" ? q.topic : "Жалпы",
+          imageUrl: imageQuery
+            ? `https://loremflickr.com/640/360/${encodeURIComponent(imageQuery)}?lock=${Math.abs(hashStr(imageQuery))}`
+            : undefined,
+        };
+      })
       .slice(0, count);
 
     if (questions.length === 0) throw new Error("AI сұрақ құрастыра алмады, қайталап көріңіз.");
