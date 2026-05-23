@@ -223,28 +223,31 @@ export function AdiletAI() {
                 </div>
               </ScrollArea>
 
-              <div className="border-t border-[#e5ecf5] p-4">
+              <div className="border-t border-[#e5ecf5] p-3 sm:p-4">
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Заңдық сұрағыңызды қазақ тілінде жазыңыз..."
+                    placeholder="Сұрағыңызды жазыңыз..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
                     disabled={loading}
-                    className="h-11 border-[#dbe4f0] focus-visible:ring-[#1d4ed8]"
+                    className="h-11 min-w-0 flex-1 border-[#dbe4f0] focus-visible:ring-[#1d4ed8]"
                   />
                   <Button
                     onClick={send}
                     disabled={loading || !input.trim()}
-                    className="h-11 gap-2 bg-[#1d4ed8] hover:bg-[#1e40af]"
+                    className="h-11 shrink-0 gap-2 bg-[#1d4ed8] px-3 hover:bg-[#1e40af] sm:px-4"
+                    aria-label="Жіберу"
                   >
-                    <Send className="h-4 w-4" /> Жіберу
+                    <Send className="h-4 w-4" />
+                    <span className="hidden sm:inline">Жіберу</span>
                   </Button>
                 </div>
                 <p className="mt-2 text-[11px] text-slate-400">
-                  💡 Әділет AI тек жоғарыдағы білім базасына жүктелген заңдар мен бұйрықтарға сүйеніп жауап береді.
+                  💡 Әділет AI тек білім базасындағы заңдар мен бұйрықтарға сүйеніп жауап береді.
                 </p>
               </div>
+
             </>
           )}
         </section>
