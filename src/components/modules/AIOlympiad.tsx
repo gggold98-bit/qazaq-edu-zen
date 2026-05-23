@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Atom, BookOpen, ChevronRight, GraduationCap, Play } from "lucide-react";
+import { ArrowLeft, Atom, BookOpen, ChevronRight, GraduationCap, Play, Sparkles } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -63,19 +63,20 @@ export function AIOlympiad() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center gap-3">
+      <header className="flex items-start gap-3 sm:items-center">
         {track && (
           <Button
             variant="ghost"
             size="icon"
             onClick={() => { setTrack(null); setOpenSubject(null); setSelectedGrade(null); }}
-            className="rounded-full"
+            className="mt-1 shrink-0 rounded-full sm:mt-0"
+            aria-label={t("Артқа", "Назад", "Back")}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
         )}
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">{title}</h1>
           {track && (
             <p className="mt-1 text-sm text-muted-foreground">{t(...TRACKS[track].title)}</p>
           )}
@@ -89,24 +90,24 @@ export function AIOlympiad() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="grid gap-4 sm:grid-cols-2"
+            className="grid gap-4 md:grid-cols-2"
           >
             {(Object.keys(TRACKS) as TrackKey[]).map((k) => (
               <button
                 key={k}
                 onClick={() => setTrack(k)}
-                className="glass group relative flex flex-col items-start gap-4 overflow-hidden rounded-3xl border border-glass-border p-6 text-left transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10"
+                className="glass group relative flex flex-col items-start gap-4 overflow-hidden rounded-3xl border border-glass-border p-5 pr-12 text-left transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 sm:p-6"
               >
                 <div className="gradient-emerald flex h-12 w-12 items-center justify-center rounded-2xl shadow-lg shadow-primary/30">
                   {k === "jmb" ? <Atom className="h-6 w-6 text-white" /> : <BookOpen className="h-6 w-6 text-white" />}
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold tracking-tight">{t(...TRACKS[k].title)}</h3>
+                <div className="min-w-0">
+                  <h3 className="text-base font-semibold leading-snug tracking-tight sm:text-lg">{t(...TRACKS[k].title)}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {TRACKS[k].subjects.length} {t("пән", "предметов", "subjects")}
                   </p>
                 </div>
-                <ChevronRight className="absolute right-6 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                <ChevronRight className="absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-transform group-hover:translate-x-1" />
               </button>
             ))}
           </motion.div>
@@ -118,26 +119,26 @@ export function AIOlympiad() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="grid gap-3 sm:grid-cols-2"
+            className="grid gap-3 md:grid-cols-2"
           >
             {TRACKS[track].subjects.map((s, i) => {
               const isOpen = openSubject === i;
               return (
                 <div
                   key={i}
-                  className="glass overflow-hidden rounded-2xl border border-glass-border"
+                  className="glass overflow-hidden rounded-2xl border border-glass-border transition-all hover:border-primary/30"
                 >
                   <button
                     onClick={() => { setOpenSubject(isOpen ? null : i); setSelectedGrade(null); }}
                     className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-accent/40"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                         <GraduationCap className="h-5 w-5 text-primary" />
                       </div>
-                      <span className="font-medium">{t(s.kk, s.ru, s.en)}</span>
+                      <span className="truncate font-medium">{t(s.kk, s.ru, s.en)}</span>
                     </div>
-                    <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
+                    <ChevronRight className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
                   </button>
 
                   <AnimatePresence initial={false}>
@@ -153,20 +154,20 @@ export function AIOlympiad() {
                           <div className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                             {t("Сыныпты таңдаңыз", "Выберите класс", "Select grade")}
                           </div>
-                          <div className="flex flex-wrap gap-2">
+                          <div className="grid grid-cols-4 gap-2 sm:flex sm:flex-wrap">
                             {GRADES.map((g) => {
                               const active = selectedGrade?.subject === i && selectedGrade.grade === g;
                               return (
                                 <button
                                   key={g}
                                   onClick={() => setSelectedGrade({ subject: i, grade: g })}
-                                  className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                                  className={`min-h-10 rounded-xl px-3 py-2 text-sm font-semibold transition-all ${
                                     active
                                       ? "gradient-emerald text-white shadow-lg shadow-primary/30"
                                       : "glass border border-glass-border hover:border-primary/40"
                                   }`}
                                 >
-                                  {g} {t("сынып", "класс", "grade")}
+                                  {g} {t("сын.", "кл.", "gr.")}
                                 </button>
                               );
                             })}
@@ -175,16 +176,19 @@ export function AIOlympiad() {
                             <motion.div
                               initial={{ opacity: 0, y: 6 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="mt-4 rounded-xl bg-primary/5 p-4 text-sm"
+                              className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm"
                             >
                               {track === "jmb" && i === 4 && selectedGrade.grade >= 7 ? (
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                  <div className="text-muted-foreground">
-                                    {t(
-                                      `География — ${selectedGrade.grade}-сынып. Оқулық бойынша AI 30 сұрақтан тұратын жаңа тест дайындайды.`,
-                                      `География — ${selectedGrade.grade} класс. ИИ подготовит новый тест из 30 вопросов по учебнику.`,
-                                      `Geography — grade ${selectedGrade.grade}. AI will generate a new 30-question test from the textbook.`,
-                                    )}
+                                  <div className="flex items-start gap-2 text-muted-foreground">
+                                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                                    <span>
+                                      {t(
+                                        `География — ${selectedGrade.grade}-сынып. AI оқулық бойынша 30 сұрақ дайындайды.`,
+                                        `География — ${selectedGrade.grade} класс. ИИ подготовит тест из 30 вопросов.`,
+                                        `Geography — grade ${selectedGrade.grade}. AI will generate 30 questions.`,
+                                      )}
+                                    </span>
                                   </div>
                                   <Button
                                     onClick={() =>
@@ -193,7 +197,7 @@ export function AIOlympiad() {
                                         params: { grade: String(selectedGrade.grade) },
                                       })
                                     }
-                                    className="gradient-emerald text-white"
+                                    className="gradient-emerald w-full shrink-0 text-white shadow-lg shadow-primary/30 sm:w-auto"
                                   >
                                     <Play className="mr-2 h-4 w-4" />
                                     {t("Тестті бастау", "Начать тест", "Start test")}
