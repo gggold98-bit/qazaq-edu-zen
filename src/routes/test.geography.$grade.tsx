@@ -298,10 +298,10 @@ function GeoTestPage() {
                   key="result"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex-1 overflow-y-auto p-8"
+                  className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
                 >
                   {error && !result ? (
-                    <div className="flex flex-col items-center justify-center gap-4 text-center">
+                    <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
                       <XCircle className="h-12 w-12 text-destructive" />
                       <h2 className="text-2xl font-semibold">Қате</h2>
                       <p className="max-w-md text-sm text-muted-foreground">{error}</p>
