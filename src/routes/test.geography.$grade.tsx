@@ -110,10 +110,16 @@ function GeoTestPage() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4 dark:from-emerald-950/40 dark:via-background dark:to-sky-950/40">
-      {/* 16:9 stage */}
-      <div className="relative w-full max-w-[1600px]" style={{ aspectRatio: "16 / 9" }}>
-        <div className="relative h-full w-full overflow-hidden rounded-3xl border border-glass-border bg-background/80 shadow-2xl shadow-primary/10 backdrop-blur-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-0 dark:from-emerald-950/40 dark:via-background dark:to-sky-950/40 lg:p-4">
+      {/* Responsive stage: 16:9 on large screens, full screen on small */}
+      <div
+        className="relative h-full w-full lg:max-w-[1600px] lg:h-auto"
+        style={{}}
+      >
+        <div
+          className="relative h-full w-full overflow-hidden rounded-none border-0 bg-background/80 shadow-2xl shadow-primary/10 backdrop-blur-xl lg:rounded-3xl lg:border lg:border-glass-border"
+          style={{}}
+        >
           {/* top bar */}
           <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-4 border-b border-glass-border bg-background/70 px-6 py-3 backdrop-blur">
             <Button variant="ghost" size="sm" onClick={exit} className="gap-2">
