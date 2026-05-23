@@ -113,7 +113,7 @@ function GeoTestPage() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-0 dark:from-emerald-950/40 dark:via-background dark:to-sky-950/40 lg:p-4">
       {/* Responsive stage: 16:9 on large screens, full screen on small */}
       <div
-        className="relative h-full w-full lg:max-w-[1600px] lg:h-auto"
+        className="relative h-full w-full lg:max-w-[1600px] lg:h-auto lg:aspect-video"
         style={{}}
       >
         <div
