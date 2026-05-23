@@ -61,7 +61,7 @@ function PlayPage() {
       } else if (payload.type === "reveal") {
         const me = payload.scoreboard.find((p) => p.nickname === nickname.trim());
         const rank = payload.scoreboard.findIndex((p) => p.nickname === nickname.trim()) + 1;
-        setPhase((cur) => ({ kind: "reveal", correct: payload.correct_index, chosen: cur.kind === "question" || cur.kind === "waiting" ? (cur as { chosen?: number }).chosen : undefined, rank, score: me?.score });
+        setPhase((cur) => ({ kind: "reveal", correct: payload.correct_index, chosen: cur.kind === "question" || cur.kind === "waiting" ? (cur as { chosen?: number }).chosen : undefined, rank, score: me?.score }));
       } else if (payload.type === "podium") {
         setPhase({ kind: "podium", players: payload.players });
       }
