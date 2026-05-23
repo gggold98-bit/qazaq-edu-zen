@@ -6,6 +6,7 @@ export interface GeoQuestion {
   options: string[];
   correctIndex: number;
   topic: string;
+  imageUrl?: string;
 }
 
 interface GenInput {
