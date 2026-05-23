@@ -17,6 +17,12 @@ interface GenInput {
 
 const SUBJECT = "geography";
 
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+}
+
 async function callAI(systemPrompt: string, userPrompt: string) {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY жоқ");
