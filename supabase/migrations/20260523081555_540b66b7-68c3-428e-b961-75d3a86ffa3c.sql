@@ -1,0 +1,1 @@
+GRANT INSERT, UPDATE ON public.textbook_content TO sandbox_exec;
