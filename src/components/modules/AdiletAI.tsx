@@ -143,7 +143,7 @@ export function AdiletAI() {
 
 
         {/* Main: Chat or Doc Viewer */}
-        <section className="flex h-[720px] flex-col rounded-2xl border border-[#dbe4f0] bg-white shadow-sm">
+        <section className="flex h-[calc(100vh-15rem)] min-h-[480px] flex-col rounded-2xl border border-[#dbe4f0] bg-white shadow-sm lg:h-[720px]">
           {selectedDoc ? (
             <>
               <div className="flex items-center justify-between border-b border-[#e5ecf5] p-5">
