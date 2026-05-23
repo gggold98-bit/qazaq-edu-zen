@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Atom, BookOpen, ChevronRight, GraduationCap } from "lucide-react";
+import { ArrowLeft, Atom, BookOpen, ChevronRight, GraduationCap, Play } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 
