@@ -175,12 +175,38 @@ export function AIOlympiad() {
                             <motion.div
                               initial={{ opacity: 0, y: 6 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="mt-4 rounded-xl bg-primary/5 p-4 text-sm text-muted-foreground"
+                              className="mt-4 rounded-xl bg-primary/5 p-4 text-sm"
                             >
-                              {t(
-                                `${t(s.kk, s.ru, s.en)} — ${selectedGrade.grade}-сынып. Жуырда ақпарат пайда болады.`,
-                                `${t(s.kk, s.ru, s.en)} — ${selectedGrade.grade} класс. Информация появится в ближайшее время.`,
-                                `${t(s.kk, s.ru, s.en)} — grade ${selectedGrade.grade}. Information coming soon.`,
+                              {track === "jmb" && i === 4 && selectedGrade.grade >= 7 ? (
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                  <div className="text-muted-foreground">
+                                    {t(
+                                      `География — ${selectedGrade.grade}-сынып. Оқулық бойынша AI 30 сұрақтан тұратын жаңа тест дайындайды.`,
+                                      `География — ${selectedGrade.grade} класс. ИИ подготовит новый тест из 30 вопросов по учебнику.`,
+                                      `Geography — grade ${selectedGrade.grade}. AI will generate a new 30-question test from the textbook.`,
+                                    )}
+                                  </div>
+                                  <Button
+                                    onClick={() =>
+                                      navigate({
+                                        to: "/test/geography/$grade",
+                                        params: { grade: String(selectedGrade.grade) },
+                                      })
+                                    }
+                                    className="gradient-emerald text-white"
+                                  >
+                                    <Play className="mr-2 h-4 w-4" />
+                                    {t("Тестті бастау", "Начать тест", "Start test")}
+                                  </Button>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  {t(
+                                    `${t(s.kk, s.ru, s.en)} — ${selectedGrade.grade}-сынып. Жуырда ақпарат пайда болады.`,
+                                    `${t(s.kk, s.ru, s.en)} — ${selectedGrade.grade} класс. Информация появится в ближайшее время.`,
+                                    `${t(s.kk, s.ru, s.en)} — grade ${selectedGrade.grade}. Information coming soon.`,
+                                  )}
+                                </span>
                               )}
                             </motion.div>
                           )}
