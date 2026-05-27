@@ -39,6 +39,7 @@ import { ComingSoon } from "@/components/modules/ComingSoon";
 import { Subscriptions } from "@/components/modules/Subscriptions";
 import { AIOlympiad } from "@/components/modules/AIOlympiad";
 import { QazQuiz } from "@/components/modules/QazQuiz";
+import { AiKmj } from "@/components/modules/AiKmj";
 
 function initials(name: string) {
   return name
@@ -182,7 +183,7 @@ export function AppShell() {
             >
               {activeTab === "dashboard" && <Dashboard />}
               {activeTab === "adilet" && <AdiletAI />}
-              {activeTab === "ai-kmj-bzhb" && <ComingSoon title={t("AI ҚМЖ және БЖБ-ТЖБ", "AI КСП и СОР-СОЧ", "AI Plans & Assessments")} />}
+              {activeTab === "ai-kmj-bzhb" && <AiKmj />}
               {activeTab === "ai-olympiad" && <AIOlympiad />}
               {activeTab === "courses-podcasts" && <ComingSoon title={t("Курстар және Подкасттар", "Курсы и Подкасты", "Courses & Podcasts")} />}
               {activeTab === "qaz-quiz" && <QazQuiz />}
