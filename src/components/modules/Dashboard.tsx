@@ -1,52 +1,25 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Newspaper } from "lucide-react";
+import { Newspaper, ExternalLink } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useAppStore } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { SchoolCalendar } from "@/components/modules/SchoolCalendar";
+import { fetchPedagogNews } from "@/lib/news.functions";
 
 export function Dashboard() {
   const { user } = useAppStore();
   const t = useT();
 
-  const news = [
-    {
-      date: t("10 мам", "10 мая", "May 10"),
-      title: t(
-        "ҚР БҒМ: Жаңа оқу жылына дайындық басталды",
-        "МОН РК: Стартовала подготовка к новому учебному году",
-        "MES RK: Preparation for the new school year has begun",
-      ),
-      source: t("Білім.kz", "Bilim.kz", "Bilim.kz"),
-    },
-    {
-      date: t("8 мам", "8 мая", "May 8"),
-      title: t(
-        "Педагогтерге арналған AI құралдары: жаңа тренд",
-        "AI-инструменты для педагогов: новый тренд",
-        "AI tools for teachers: a new trend",
-      ),
-      source: t("EdTech KZ", "EdTech KZ", "EdTech KZ"),
-    },
-    {
-      date: t("3 мам", "3 мая", "May 3"),
-      title: t(
-        "Ұстаздарға арналған республикалық байқау жарияланды",
-        "Объявлен республиканский конкурс для учителей",
-        "Republican contest for teachers announced",
-      ),
-      source: t("Ustaz.kz", "Ustaz.kz", "Ustaz.kz"),
-    },
-  ];
-
-  const events = [
-    { date: t("12 мау", "12 июн", "Jun 12"), title: t("Вебинар: Цифрлық сауаттылық", "Вебинар: Цифровая грамотность", "Webinar: Digital Literacy"), tag: t("Вебинар", "Вебинар", "Webinar") },
-    { date: t("20 мау", "20 июн", "Jun 20"), title: t("Сертификаттау емтиханы", "Сертификационный экзамен", "Certification exam"), tag: t("Емтихан", "Экзамен", "Exam") },
-    { date: t("28 мау", "28 июн", "Jun 28"), title: t("Әдістемелік семинар", "Методический семинар", "Methodology seminar"), tag: t("Семинар", "Семинар", "Seminar") },
-  ];
-
-  const monthShort = (s: string) => s.split(" ")[1];
-  const dayShort = (s: string) => s.split(" ")[0];
+  const getNews = useServerFn(fetchPedagogNews);
+  const { data, isLoading } = useQuery({
+    queryKey: ["pedagog-news"],
+    queryFn: () => getNews(),
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+  });
+  const news = data?.items ?? [];
 
   return (
     <div className="space-y-8">
@@ -68,22 +41,68 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="glass rounded-2xl p-6"
         >
-          <div className="mb-4 flex items-center gap-2">
-            <Newspaper className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">{t("Жаңалықтар", "Новости", "News")}</h3>
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Newspaper className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">{t("Жаңалықтар", "Новости", "News")}</h3>
+            </div>
+            <a
+              href="https://pedagog-kz.kz/category/news"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              Pedagog-KZ <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
-          <div className="space-y-3">
-            {news.map((n) => (
-              <div key={n.title} className="flex items-start gap-3 rounded-xl border border-border/60 bg-card/40 p-4">
-                <div className="gradient-emerald flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl text-white">
-                  <div className="text-[10px] uppercase tracking-wide opacity-80">{monthShort(n.date)}</div>
-                  <div className="text-sm font-bold leading-none">{dayShort(n.date)}</div>
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium leading-snug">{n.title}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{n.source}</div>
-                </div>
+
+          <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+            {isLoading && (
+              <div className="space-y-3">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-20 animate-pulse rounded-xl bg-card/40" />
+                ))}
               </div>
+            )}
+
+            {!isLoading && news.length === 0 && (
+              <div className="rounded-xl border border-border/60 bg-card/40 p-4 text-sm text-muted-foreground">
+                {t(
+                  "Жаңалықтарды жүктеу мүмкін болмады.",
+                  "Не удалось загрузить новости.",
+                  "Could not load news right now.",
+                )}
+              </div>
+            )}
+
+            {news.map((n) => (
+              <a
+                key={n.url}
+                href={n.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-3 rounded-xl border border-border/60 bg-card/40 p-3 transition-colors hover:border-primary/40 hover:bg-card/70"
+              >
+                {n.image ? (
+                  <div
+                    className="h-16 w-16 shrink-0 rounded-lg bg-cover bg-center ring-1 ring-border/60"
+                    style={{ backgroundImage: `url(${n.image})` }}
+                  />
+                ) : (
+                  <div className="gradient-emerald flex h-16 w-16 shrink-0 items-center justify-center rounded-lg text-white">
+                    <Newspaper className="h-5 w-5" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium leading-snug group-hover:text-primary">
+                    {n.title}
+                  </div>
+                  <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>Pedagog-KZ</span>
+                    {n.date && <span className="opacity-60">· {n.date}</span>}
+                  </div>
+                </div>
+              </a>
             ))}
           </div>
         </motion.div>
