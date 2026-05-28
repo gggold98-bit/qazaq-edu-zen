@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PlayRouteImport } from './routes/play'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TestGeographyGradeRouteImport } from './routes/test.geography.$grade'
+import { Route as TestSubjectGradeRouteImport } from './routes/test.$subject.$grade'
 
 const PlayRoute = PlayRouteImport.update({
   id: '/play',
@@ -28,34 +29,48 @@ const TestGeographyGradeRoute = TestGeographyGradeRouteImport.update({
   path: '/test/geography/$grade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestSubjectGradeRoute = TestSubjectGradeRouteImport.update({
+  id: '/test/$subject/$grade',
+  path: '/test/$subject/$grade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/play': typeof PlayRoute
+  '/test/$subject/$grade': typeof TestSubjectGradeRoute
   '/test/geography/$grade': typeof TestGeographyGradeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/play': typeof PlayRoute
+  '/test/$subject/$grade': typeof TestSubjectGradeRoute
   '/test/geography/$grade': typeof TestGeographyGradeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/play': typeof PlayRoute
+  '/test/$subject/$grade': typeof TestSubjectGradeRoute
   '/test/geography/$grade': typeof TestGeographyGradeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/play' | '/test/geography/$grade'
+  fullPaths: '/' | '/play' | '/test/$subject/$grade' | '/test/geography/$grade'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/play' | '/test/geography/$grade'
-  id: '__root__' | '/' | '/play' | '/test/geography/$grade'
+  to: '/' | '/play' | '/test/$subject/$grade' | '/test/geography/$grade'
+  id:
+    | '__root__'
+    | '/'
+    | '/play'
+    | '/test/$subject/$grade'
+    | '/test/geography/$grade'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PlayRoute: typeof PlayRoute
+  TestSubjectGradeRoute: typeof TestSubjectGradeRoute
   TestGeographyGradeRoute: typeof TestGeographyGradeRoute
 }
 
@@ -82,14 +97,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestGeographyGradeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/test/$subject/$grade': {
+      id: '/test/$subject/$grade'
+      path: '/test/$subject/$grade'
+      fullPath: '/test/$subject/$grade'
+      preLoaderRoute: typeof TestSubjectGradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PlayRoute: PlayRoute,
+  TestSubjectGradeRoute: TestSubjectGradeRoute,
   TestGeographyGradeRoute: TestGeographyGradeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
