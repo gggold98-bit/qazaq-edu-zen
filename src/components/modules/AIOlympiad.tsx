@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 type TrackKey = "jmb" | "gum";
 
 interface Subject {
+  slug: string;
   kk: string;
   ru: string;
   en: string;
@@ -21,14 +22,14 @@ const TRACKS: Record<TrackKey, { title: [string, string, string]; subjects: Subj
       "Natural sciences & math track",
     ],
     subjects: [
-      { kk: "Математика", ru: "Математика", en: "Mathematics" },
-      { kk: "Физика", ru: "Физика", en: "Physics" },
-      { kk: "Химия", ru: "Химия", en: "Chemistry" },
-      { kk: "Биология", ru: "Биология", en: "Biology" },
-      { kk: "География", ru: "География", en: "Geography" },
-      { kk: "Информатика", ru: "Информатика", en: "Computer Science" },
-      { kk: "Робототехника", ru: "Робототехника", en: "Robotics" },
-      { kk: "Экология", ru: "Экология", en: "Ecology" },
+      { slug: "math",        kk: "Математика",     ru: "Математика",     en: "Mathematics" },
+      { slug: "physics",     kk: "Физика",         ru: "Физика",         en: "Physics" },
+      { slug: "chemistry",   kk: "Химия",          ru: "Химия",          en: "Chemistry" },
+      { slug: "biology",     kk: "Биология",       ru: "Биология",       en: "Biology" },
+      { slug: "geography",   kk: "География",      ru: "География",      en: "Geography" },
+      { slug: "informatics", kk: "Информатика",    ru: "Информатика",    en: "Computer Science" },
+      { slug: "robotics",    kk: "Робототехника",  ru: "Робототехника",  en: "Robotics" },
+      { slug: "ecology",     kk: "Экология",       ru: "Экология",       en: "Ecology" },
     ],
   },
   gum: {
@@ -38,14 +39,14 @@ const TRACKS: Record<TrackKey, { title: [string, string, string]; subjects: Subj
       "Humanities track",
     ],
     subjects: [
-      { kk: "Қазақ тілі мен әдебиеті", ru: "Казахский язык и литература", en: "Kazakh language & literature" },
-      { kk: "Орыс тілі мен әдебиеті", ru: "Русский язык и литература", en: "Russian language & literature" },
-      { kk: "Ағылшын тілі", ru: "Английский язык", en: "English language" },
-      { kk: "Қазақстан тарихы", ru: "История Казахстана", en: "History of Kazakhstan" },
-      { kk: "Дүниежүзі тарихы", ru: "Всемирная история", en: "World history" },
-      { kk: "Құқық негіздері", ru: "Основы права", en: "Fundamentals of law" },
-      { kk: "Экономика негіздері", ru: "Основы экономики", en: "Fundamentals of economics" },
-      { kk: "Психология", ru: "Психология", en: "Psychology" },
+      { slug: "kazakh-lit",    kk: "Қазақ тілі мен әдебиеті", ru: "Казахский язык и литература", en: "Kazakh language & literature" },
+      { slug: "russian-lit",   kk: "Орыс тілі мен әдебиеті",  ru: "Русский язык и литература",   en: "Russian language & literature" },
+      { slug: "english",       kk: "Ағылшын тілі",            ru: "Английский язык",             en: "English language" },
+      { slug: "kz-history",    kk: "Қазақстан тарихы",        ru: "История Казахстана",          en: "History of Kazakhstan" },
+      { slug: "world-history", kk: "Дүниежүзі тарихы",        ru: "Всемирная история",           en: "World history" },
+      { slug: "law",           kk: "Құқық негіздері",         ru: "Основы права",                en: "Fundamentals of law" },
+      { slug: "economics",     kk: "Экономика негіздері",     ru: "Основы экономики",            en: "Fundamentals of economics" },
+      { slug: "psychology",    kk: "Психология",              ru: "Психология",                  en: "Psychology" },
     ],
   },
 };
@@ -122,9 +123,10 @@ export function AIOlympiad() {
           >
             {TRACKS[track].subjects.map((s, i) => {
               const isOpen = openSubject === i;
+              const subjName = t(s.kk, s.ru, s.en);
               return (
                 <div
-                  key={i}
+                  key={s.slug}
                   className="glass overflow-hidden rounded-2xl border border-glass-border"
                 >
                   <button
@@ -135,7 +137,7 @@ export function AIOlympiad() {
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                         <GraduationCap className="h-5 w-5 text-primary" />
                       </div>
-                      <span className="font-medium">{t(s.kk, s.ru, s.en)}</span>
+                      <span className="font-medium">{subjName}</span>
                     </div>
                     <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`} />
                   </button>
@@ -177,37 +179,30 @@ export function AIOlympiad() {
                               animate={{ opacity: 1, y: 0 }}
                               className="mt-4 rounded-xl bg-primary/5 p-4 text-sm"
                             >
-                              {track === "jmb" && i === 4 && selectedGrade.grade >= 7 ? (
-                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                  <div className="text-muted-foreground">
-                                    {t(
-                                      `География — ${selectedGrade.grade}-сынып. Оқулық бойынша AI 30 сұрақтан тұратын жаңа тест дайындайды.`,
-                                      `География — ${selectedGrade.grade} класс. ИИ подготовит новый тест из 30 вопросов по учебнику.`,
-                                      `Geography — grade ${selectedGrade.grade}. AI will generate a new 30-question test from the textbook.`,
-                                    )}
-                                  </div>
-                                  <Button
-                                    onClick={() =>
-                                      navigate({
-                                        to: "/test/geography/$grade",
-                                        params: { grade: String(selectedGrade.grade) },
-                                      })
-                                    }
-                                    className="gradient-emerald text-white"
-                                  >
-                                    <Play className="mr-2 h-4 w-4" />
-                                    {t("Тестті бастау", "Начать тест", "Start test")}
-                                  </Button>
-                                </div>
-                              ) : (
-                                <span className="text-muted-foreground">
+                              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="text-muted-foreground">
                                   {t(
-                                    `${t(s.kk, s.ru, s.en)} — ${selectedGrade.grade}-сынып. Жуырда ақпарат пайда болады.`,
-                                    `${t(s.kk, s.ru, s.en)} — ${selectedGrade.grade} класс. Информация появится в ближайшее время.`,
-                                    `${t(s.kk, s.ru, s.en)} — grade ${selectedGrade.grade}. Information coming soon.`,
+                                    `${subjName} — ${selectedGrade.grade}-сынып. AI 30 сұрақтан тұратын жаңа тест дайындайды.`,
+                                    `${subjName} — ${selectedGrade.grade} класс. ИИ подготовит новый тест из 30 вопросов.`,
+                                    `${subjName} — grade ${selectedGrade.grade}. AI will generate a new 30-question test.`,
                                   )}
-                                </span>
-                              )}
+                                </div>
+                                <Button
+                                  onClick={() =>
+                                    navigate({
+                                      to: "/test/$subject/$grade",
+                                      params: {
+                                        subject: s.slug,
+                                        grade: String(selectedGrade.grade),
+                                      },
+                                    })
+                                  }
+                                  className="gradient-emerald text-white"
+                                >
+                                  <Play className="mr-2 h-4 w-4" />
+                                  {t("Тестті бастау", "Начать тест", "Start test")}
+                                </Button>
+                              </div>
                             </motion.div>
                           )}
                         </div>
