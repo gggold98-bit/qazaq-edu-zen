@@ -4,17 +4,19 @@ import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Loader2, Sparkles, XCircle } from "lucide-react";
 import {
-  generateGeoTest,
-  submitGeoTest,
-  type GeoQuestion,
-} from "@/lib/geo-test.functions";
+  generateOlympiadTest,
+  submitOlympiadTest,
+  subjectLabel,
+  SUBJECT_SLUGS,
+  type OlympiadQuestion,
+} from "@/lib/olympiad-test.functions";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
 
-export const Route = createFileRoute("/test/geography/$grade")({
-  component: GeoTestPage,
+export const Route = createFileRoute("/test/$subject/$grade")({
+  component: OlympiadTestPage,
   head: () => ({
-    meta: [{ title: "География тесті — Qazaq Teachers AI" }],
+    meta: [{ title: "Олимпиада тесті — Qazaq Teachers AI" }],
   }),
 });
 
@@ -29,20 +31,23 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function GeoTestPage() {
-  const { grade: gradeStr } = Route.useParams();
+function OlympiadTestPage() {
+  const { subject, grade: gradeStr } = Route.useParams();
   const grade = Number(gradeStr);
   const navigate = useNavigate();
   const router = useRouter();
   const user = useAppStore((s) => s.user);
   const authReady = useAppStore((s) => s.authReady);
+  const lang = useAppStore((s) => s.lang);
 
-  const genFn = useServerFn(generateGeoTest);
-  const subFn = useServerFn(submitGeoTest);
+  const genFn = useServerFn(generateOlympiadTest);
+  const subFn = useServerFn(submitOlympiadTest);
+
+  const subjectName = subjectLabel(subject, lang);
 
   const [phase, setPhase] = useState<Phase>("loading");
   const [error, setError] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<GeoQuestion[]>([]);
+  const [questions, setQuestions] = useState<OlympiadQuestion[]>([]);
   const [answers, setAnswers] = useState<number[]>([]);
   const [current, setCurrent] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -59,7 +64,7 @@ function GeoTestPage() {
     setResult(null);
     setCurrent(0);
     try {
-      const r = await genFn({ data: { grade, focusTopics, count: 30 } });
+      const r = await genFn({ data: { subject, grade, lang, focusTopics, count: 30 } });
       const qs = shuffle(r.questions);
       setQuestions(qs);
       setAnswers(new Array(qs.length).fill(-1));
@@ -76,13 +81,13 @@ function GeoTestPage() {
       navigate({ to: "/" });
       return;
     }
-    if (![7, 8, 9, 10, 11].includes(grade)) {
+    if (!SUBJECT_SLUGS.includes(subject) || ![5, 6, 7, 8, 9, 10, 11].includes(grade)) {
       navigate({ to: "/" });
       return;
     }
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authReady, user, grade]);
+  }, [authReady, user, subject, grade]);
 
   const answered = answers.filter((a) => a >= 0).length;
 
@@ -94,7 +99,7 @@ function GeoTestPage() {
         topic: q.topic,
         was_correct: answers[i] === q.correctIndex,
       }));
-      const r = await subFn({ data: { grade, results } });
+      const r = await subFn({ data: { subject, grade, results } });
       setResult(r);
       setPhase("result");
     } catch (e) {
@@ -111,22 +116,14 @@ function GeoTestPage() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-0 dark:from-emerald-950/40 dark:via-background dark:to-sky-950/40 lg:p-4">
-      {/* Responsive stage: 16:9 on large screens, full screen on small */}
-      <div
-        className="relative h-full w-full lg:max-w-[1600px] lg:h-auto lg:aspect-video"
-        style={{}}
-      >
-        <div
-          className="relative h-full w-full overflow-hidden rounded-none border-0 bg-background/80 shadow-2xl shadow-primary/10 backdrop-blur-xl lg:rounded-3xl lg:border lg:border-glass-border"
-          style={{}}
-        >
-          {/* top bar */}
+      <div className="relative h-full w-full lg:max-w-[1600px] lg:h-auto lg:aspect-video">
+        <div className="relative h-full w-full overflow-hidden rounded-none border-0 bg-background/80 shadow-2xl shadow-primary/10 backdrop-blur-xl lg:rounded-3xl lg:border lg:border-glass-border">
           <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-between gap-4 border-b border-glass-border bg-background/70 px-6 py-3 backdrop-blur">
             <Button variant="ghost" size="sm" onClick={exit} className="gap-2">
               <ArrowLeft className="h-4 w-4" /> Шығу
             </Button>
             <div className="text-sm font-medium text-muted-foreground">
-              География · {grade}-сынып
+              {subjectName} · {grade}-сынып
             </div>
             <div className="text-sm font-semibold">
               {phase === "test" ? `${current + 1} / ${questions.length}` : phase === "loading" ? "Дайындалуда…" : "Нәтиже"}
@@ -146,7 +143,7 @@ function GeoTestPage() {
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                   <h2 className="text-2xl font-semibold">AI сұрақтарды құрастыруда…</h2>
                   <p className="max-w-md text-sm text-muted-foreground">
-                    Жүктелген оқулық негізінде {grade}-сыныпқа арналған 30 жаңа сұрақ дайындалуда. Бұл 10–20 секунд алады.
+                    {subjectName}, {grade}-сыныпқа арналған 30 жаңа сұрақ дайындалуда. Бұл 10–20 секунд алады.
                   </p>
                 </motion.div>
               )}
@@ -305,7 +302,7 @@ function ResultView({
   onExit,
 }: {
   result: { score: number; total: number; percent: number; weakTopics: { topic: string; wrong: number; total: number }[] };
-  questions: GeoQuestion[];
+  questions: OlympiadQuestion[];
   answers: number[];
   onRetry: () => void;
   onFocus: () => void;
@@ -319,6 +316,7 @@ function ResultView({
         .filter((x) => !x.ok),
     [questions, answers],
   );
+  void wrongList;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
